@@ -3,25 +3,24 @@
 package gcd
 
 import chisel3.iotesters
-import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
+import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
 
 class GCDUnitTester(c: GCD) extends PeekPokeTester(c) {
   /**
-    * compute the gcd and the number of steps it should take to do it
-    *
-    * @param a positive integer
-    * @param b positive integer
-    * @return the GCD of a and b
-    */
+   * compute the gcd and the number of steps it should take to do it
+   *
+   * @param a positive integer
+   * @param b positive integer
+   * @return the GCD of a and b
+   */
   def computeGcd(a: Int, b: Int): (Int, Int) = {
     var x = a
     var y = b
     var depth = 1
-    while(y > 0 ) {
+    while (y > 0) {
       if (x > y) {
         x -= y
-      }
-      else {
+      } else {
         y -= x
       }
       depth += 1
@@ -31,7 +30,7 @@ class GCDUnitTester(c: GCD) extends PeekPokeTester(c) {
 
   private val gcd = c
 
-  for(i <- 1 to 40 by 3) {
+  for (i <- 1 to 40 by 3) {
     for (j <- 1 to 40 by 7) {
       poke(gcd.io.value1, i)
       poke(gcd.io.value2, j)
@@ -49,39 +48,38 @@ class GCDUnitTester(c: GCD) extends PeekPokeTester(c) {
 }
 
 /**
-  * This is a trivial example of how to run this Specification
-  * From within sbt use:
-  * {{{
-  * testOnly example.test.GCDTester
-  * }}}
-  * From a terminal shell use:
-  * {{{
-  * sbt 'testOnly example.test.GCDTester'
-  * }}}
-  */
+ * This is a trivial example of how to run this Specification
+ * From within sbt use:
+ * {{{
+ * testOnly example.test.GCDTester
+ * }}}
+ * From a terminal shell use:
+ * {{{
+ * sbt 'testOnly example.test.GCDTester'
+ * }}}
+ */
 class GCDTester extends ChiselFlatSpec {
-  private val backendNames = if(firrtl.FileUtils.isCommandAvailable("verilator")) {
+  private val backendNames = if (firrtl.FileUtils.isCommandAvailable("verilator")) {
     Array("firrtl", "verilator")
-  }
-  else {
+  } else {
     Array("firrtl")
   }
-  for ( backendName <- backendNames ) {
+  for (backendName <- backendNames) {
     "GCD" should s"calculate proper greatest common denominator (with $backendName)" in {
       Driver(() => new GCD, backendName) {
         c => new GCDUnitTester(c)
-      } should be (true)
+      } should be(true)
     }
   }
 
   "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
     iotesters.Driver.execute(Array(), () => new GCD) {
       c => new GCDUnitTester(c)
-    } should be (true)
+    } should be(true)
   }
 
   "using --backend-name verilator" should "be an alternative way to run using verilator" in {
-    if(backendNames.contains("verilator")) {
+    if (backendNames.contains("verilator")) {
       iotesters.Driver.execute(Array("--backend-name", "verilator"), () => new GCD) {
         c => new GCDUnitTester(c)
       } should be(true)
@@ -103,6 +101,6 @@ class GCDTester extends ChiselFlatSpec {
   "using --help" should s"show the many options available" in {
     iotesters.Driver.execute(Array("--help"), () => new GCD) {
       c => new GCDUnitTester(c)
-    } should be (true)
+    } should be(true)
   }
 }
