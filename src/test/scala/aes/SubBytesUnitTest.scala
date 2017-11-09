@@ -26,7 +26,7 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
 
     var state_out = new Array[Int](16)
 
-    for (i <- 0 to 16) {
+    for (i <- 0 until 16) {
       state_out(i) = s_box(state_in(i))
     }
     state_out
@@ -40,8 +40,8 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
 
   state = computeSubBytes(state)
   println(state.deep.mkString(" "))
-  //expect(4, 4)
-
+    for (i <- 0 until 16)
+    expect(aes_sb.io.state_out(i), state(i))
 }
 
 class SubBytesTester extends ChiselFlatSpec {
