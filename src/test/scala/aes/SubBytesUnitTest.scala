@@ -34,13 +34,15 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
 
   private val aes_sb = c
   var state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
+
   for (i <- 0 until 16)
     poke(aes_sb.io.state_in(i), state(i))
   step(1)
 
   state = computeSubBytes(state)
   println(state.deep.mkString(" "))
-    for (i <- 0 until 16)
+
+  for (i <- 0 until 16)
     expect(aes_sb.io.state_out(i), state(i))
 }
 
