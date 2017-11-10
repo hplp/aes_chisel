@@ -138,5 +138,5 @@ class MixColumns extends Module {
 }
 
 object MixColumns {
-  def apply(): MixColumns = new MixColumns()
+  def apply(): MixColumns = Module(new MixColumns())
 }

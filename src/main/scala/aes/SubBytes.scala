@@ -32,5 +32,5 @@ class SubBytes extends Module {
 }
 
 object SubBytes {
-  def apply(): SubBytes = new SubBytes()
+  def apply(): SubBytes = Module(new SubBytes())
 }

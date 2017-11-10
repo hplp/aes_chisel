@@ -138,5 +138,5 @@ class InvMixColumns extends Module {
 }
 
 object InvMixColumns {
-  def apply(): InvMixColumns = new InvMixColumns()
+  def apply(): InvMixColumns = Module(new InvMixColumns())
 }

@@ -15,5 +15,5 @@ class AddRoundKey extends Module {
 }
 
 object AddRoundKey {
-  def apply(): AddRoundKey = new AddRoundKey()
+  def apply(): AddRoundKey = Module(new AddRoundKey())
 }

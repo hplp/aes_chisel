@@ -30,5 +30,5 @@ class ShiftRows extends Module {
 }
 
 object ShiftRows {
-  def apply(): ShiftRows = new ShiftRows()
+  def apply(): ShiftRows = Module(new ShiftRows())
 }

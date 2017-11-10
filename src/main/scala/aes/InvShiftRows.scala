@@ -30,5 +30,5 @@ class InvShiftRows extends Module {
 }
 
 object InvShiftRows {
-  def apply(): InvShiftRows = new InvShiftRows()
+  def apply(): InvShiftRows = Module(new InvShiftRows())
 }
