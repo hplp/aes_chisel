@@ -30,3 +30,7 @@ class SubBytes extends Module {
     io.state_out(i) := s_box(io.state_in(i))
   }
 }
+
+object SubBytes {
+  def apply(): SubBytes = new SubBytes()
+}

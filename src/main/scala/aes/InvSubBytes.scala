@@ -30,3 +30,7 @@ class InvSubBytes extends Module {
     io.state_out(i) := inverted_s_box(io.state_in(i))
   }
 }
+
+object InvSubBytes {
+  def apply(): InvSubBytes = new InvSubBytes()
+}

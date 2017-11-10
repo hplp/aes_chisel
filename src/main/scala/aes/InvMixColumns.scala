@@ -136,3 +136,7 @@ class InvMixColumns extends Module {
   io.state_out(14) := mul13(io.state_in(12)) ^ mul09(io.state_in(13)) ^ mul14(io.state_in(14)) ^ mul11(io.state_in(15))
   io.state_out(15) := mul11(io.state_in(12)) ^ mul13(io.state_in(13)) ^ mul09(io.state_in(14)) ^ mul14(io.state_in(15))
 }
+
+object InvMixColumns {
+  def apply(): InvMixColumns = new InvMixColumns()
+}

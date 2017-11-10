@@ -28,3 +28,7 @@ class ShiftRows extends Module {
   io.state_out(14) := io.state_in(6)
   io.state_out(15) := io.state_in(11)
 }
+
+object ShiftRows {
+  def apply(): ShiftRows = new ShiftRows()
+}

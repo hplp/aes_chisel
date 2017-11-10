@@ -13,3 +13,7 @@ class AddRoundKey extends Module {
     io.state_out(i) := io.state_in(i) ^ io.roundKey(i)
   }
 }
+
+object AddRoundKey {
+  def apply(): AddRoundKey = new AddRoundKey()
+}

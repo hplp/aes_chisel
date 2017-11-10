@@ -136,3 +136,7 @@ class MixColumns extends Module {
   io.state_out(14) := io.state_in(12) ^ io.state_in(13) ^ mul02(io.state_in(14)) ^ mul03(io.state_in(15))
   io.state_out(15) := mul03(io.state_in(12)) ^ io.state_in(13) ^ io.state_in(14) ^ mul02(io.state_in(15))
 }
+
+object MixColumns {
+  def apply(): MixColumns = new MixColumns()
+}
