@@ -21,20 +21,35 @@ class CipherUnitTester(c: Cipher) extends PeekPokeTester(c) {
     Array(0x54, 0x99, 0x32, 0xd1, 0xf0, 0x85, 0x57, 0x68, 0x10, 0x93, 0xed, 0x9c, 0xbe, 0x2c, 0x97, 0x4e),
     Array(0x13, 0x11, 0x1d, 0x7f, 0xe3, 0x94, 0x4a, 0x17, 0xf3, 0x07, 0xa7, 0x8b, 0x4d, 0x2b, 0x30, 0xc5))
 
+  poke(aes_cipher.io.start, 0)
+  step(10) // test that things are fine in Idle state
+
+  // send the plaintext
   for (i <- 0 until 16) {
     poke(aes_cipher.io.plaintext(i), state(i))
   }
+  // send the expanded key
   for (i <- 0 until 11) {
     for (j <- 0 until 16)
       poke(aes_cipher.io.expandedKey(i)(j), expandedKey(i)(j))
   }
+  // send start
+  poke(aes_cipher.io.start, 1)
   step(1)
 
-  state = Array(0x89, 0xed, 0x5e, 0x6a, 0x05, 0xca, 0x76, 0x33, 0x81, 0x35, 0x08, 0x5f, 0xe2, 0x1c, 0x40, 0xbd)
-  println(state.deep.mkString(" "))
+  // reset start
+  poke(aes_cipher.io.start, 0)
+  step(11)
+
+  var state_e = Array(137, 237, 94, 106, 5, 202, 118, 51, 129, 53, 8, 95, 226, 28, 64, 189)
+  //state_e = Array(0xa1, 0x94, 0x4d, 0x39, 0xa6, 0x0e, 0xc1, 0x69, 0x76, 0xa4, 0x7f, 0xfe, 0x29, 0x47, 0x88, 0xd2)
+  //println(state.deep.mkString(" "))
 
   for (i <- 0 until 16)
-    expect(aes_cipher.io.state_out(i), state(i))
+    expect(aes_cipher.io.state_out(i), state_e(i))
+  expect(aes_cipher.io.state_out_valid, 1)
+  
+  step(10)
 }
 
 class CipherTester extends ChiselFlatSpec {
