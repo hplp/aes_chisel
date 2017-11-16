@@ -4,8 +4,8 @@ import chisel3._
 
 class MixColumns extends Module {
   val io = IO(new Bundle {
-    val state_in = Input(Vec(16, UInt(8.W)))
-    val state_out = Output(Vec(16, UInt(8.W)))
+    val state_in = Input(Vec(Params.stt_lng, UInt(8.W)))
+    val state_out = Output(Vec(Params.stt_lng, UInt(8.W)))
   })
 
   val mul02 = Vec(Array(

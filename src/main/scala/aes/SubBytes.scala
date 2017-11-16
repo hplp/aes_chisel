@@ -4,8 +4,8 @@ import chisel3._
 
 class SubBytes extends Module {
   val io = IO(new Bundle {
-    val state_in = Input(Vec(16, UInt(8.W)))
-    val state_out = Output(Vec(16, UInt(8.W)))
+    val state_in = Input(Vec(Params.stt_lng, UInt(8.W)))
+    val state_out = Output(Vec(Params.stt_lng, UInt(8.W)))
   })
 
   val s_box = Vec(Array(
@@ -26,7 +26,7 @@ class SubBytes extends Module {
     0xe1.U, 0xf8.U, 0x98.U, 0x11.U, 0x69.U, 0xd9.U, 0x8e.U, 0x94.U, 0x9b.U, 0x1e.U, 0x87.U, 0xe9.U, 0xce.U, 0x55.U, 0x28.U, 0xdf.U,
     0x8c.U, 0xa1.U, 0x89.U, 0x0d.U, 0xbf.U, 0xe6.U, 0x42.U, 0x68.U, 0x41.U, 0x99.U, 0x2d.U, 0x0f.U, 0xb0.U, 0x54.U, 0xbb.U, 0x16.U))
 
-  for (i <- 0 until 16) {
+  for (i <- 0 until Params.stt_lng) {
     io.state_out(i) := s_box(io.state_in(i))
   }
 }

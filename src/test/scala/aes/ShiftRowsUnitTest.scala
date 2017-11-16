@@ -6,7 +6,7 @@ import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
 class ShiftRowsUnitTester(c: ShiftRows) extends PeekPokeTester(c) {
 
   def computeShiftRows(state_in: Array[Int]): Array[Int] = {
-    var state_out = new Array[Int](16)
+    var state_out = new Array[Int](Params.stt_lng)
 
     state_out(0) = state_in(0)
     state_out(1) = state_in(5)
@@ -34,14 +34,14 @@ class ShiftRowsUnitTester(c: ShiftRows) extends PeekPokeTester(c) {
   private val aes_sr = c
   var state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
-  for (i <- 0 until 16)
+  for (i <- 0 until Params.stt_lng)
     poke(aes_sr.io.state_in(i), state(i))
   step(1)
 
   state = computeShiftRows(state)
   println(state.deep.mkString(" "))
 
-  for (i <- 0 until 16)
+  for (i <- 0 until Params.stt_lng)
     expect(aes_sr.io.state_out(i), state(i))
 }
 

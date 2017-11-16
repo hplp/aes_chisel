@@ -7,9 +7,9 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
 
   def computeAddRoundKey(state_in: Array[Int], roundKey: Array[Int]): Array[Int] = {
 
-    var state_out = new Array[Int](16)
+    var state_out = new Array[Int](Params.stt_lng)
 
-    for (i <- 0 until 16) {
+    for (i <- 0 until Params.stt_lng) {
       state_out(i) = state_in(i) ^ roundKey(i)
     }
 
@@ -20,7 +20,7 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
   var state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
   var roundKey = Array(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f)
 
-  for (i <- 0 until 16) {
+  for (i <- 0 until Params.stt_lng) {
     poke(aes_ark.io.state_in(i), state(i))
     poke(aes_ark.io.roundKey(i), roundKey(i))
   }
@@ -29,7 +29,7 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
   state = computeAddRoundKey(state, roundKey)
   println(state.deep.mkString(" "))
 
-  for (i <- 0 until 16)
+  for (i <- 0 until Params.stt_lng)
     expect(aes_ark.io.state_out(i), state(i))
 }
 

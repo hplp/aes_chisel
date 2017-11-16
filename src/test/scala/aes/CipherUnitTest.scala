@@ -25,12 +25,12 @@ class CipherUnitTester(c: Cipher) extends PeekPokeTester(c) {
   step(10) // test that things are fine in Idle state
 
   // send the plaintext
-  for (i <- 0 until 16) {
+  for (i <- 0 until Params.stt_lng) {
     poke(aes_cipher.io.plaintext(i), state(i))
   }
   // send the expanded key
-  for (i <- 0 until 11) {
-    for (j <- 0 until 16)
+  for (i <- 0 until Params.Nrplus1) {
+    for (j <- 0 until Params.stt_lng)
       poke(aes_cipher.io.expandedKey(i)(j), expandedKey(i)(j))
   }
   // send start
@@ -39,13 +39,13 @@ class CipherUnitTester(c: Cipher) extends PeekPokeTester(c) {
 
   // reset start
   poke(aes_cipher.io.start, 0)
-  step(11)
+  step(Params.Nrplus1)
 
   var state_e = Array(137, 237, 94, 106, 5, 202, 118, 51, 129, 53, 8, 95, 226, 28, 64, 189)
   //state_e = Array(0xa1, 0x94, 0x4d, 0x39, 0xa6, 0x0e, 0xc1, 0x69, 0x76, 0xa4, 0x7f, 0xfe, 0x29, 0x47, 0x88, 0xd2)
   //println(state.deep.mkString(" "))
 
-  for (i <- 0 until 16)
+  for (i <- 0 until Params.stt_lng)
     expect(aes_cipher.io.state_out(i), state_e(i))
   expect(aes_cipher.io.state_out_valid, 1)
   
