@@ -3,7 +3,7 @@ package aes
 import chisel3._
 import chisel3.util._
 
-class Cipher extends Module {
+class InvCipher extends Module {
   val io = IO(new Bundle {
     val plaintext = Input(Vec(Params.stt_lng, UInt(8.W)))
     val expandedKey = Input(Vec(Params.Nrplus1, Vec(Params.stt_lng, UInt(8.W))))
@@ -14,9 +14,9 @@ class Cipher extends Module {
 
   // Instantiate module objects
   val AddRoundKeyModule = AddRoundKey()
-  val SubBytesModule = SubBytes()
-  val ShiftRowsModule = ShiftRows()
-  val MixColumnsModule = MixColumns()
+  val InvSubBytesModule = InvSubBytes()
+  val InvShiftRowsModule = InvShiftRows()
+  val InvMixColumnsModule = InvMixColumns()
 
   // Internal variables
   val initValues = Seq.fill(Params.stt_lng) { 0.U(8.W) }
@@ -42,21 +42,20 @@ class Cipher extends Module {
     }
   }
 
-  // SubBytes state
-  SubBytesModule.io.state_in := state
+  // InvShiftRows state
+  InvShiftRowsModule.io.state_in := state
 
-  // ShiftRows state
-  ShiftRowsModule.io.state_in := SubBytesModule.io.state_out
+  // InvSubBytes state
+  InvSubBytesModule.io.state_in := InvShiftRowsModule.io.state_out
 
-  // MixColumns state
-  MixColumnsModule.io.state_in := ShiftRowsModule.io.state_out
-  
   // AddRoundKey state
-  AddRoundKeyModule.io.state_in := Mux(STM === sInitialAR, io.plaintext,
-    Mux(rounds === Params.Nr.U, ShiftRowsModule.io.state_out, MixColumnsModule.io.state_out))
-  AddRoundKeyModule.io.roundKey := io.expandedKey(rounds)
+  AddRoundKeyModule.io.state_in := Mux(STM === sInitialAR, io.plaintext, InvSubBytesModule.io.state_out)
+  AddRoundKeyModule.io.roundKey := io.expandedKey(Params.Nr.U - rounds)
 
-  state := Mux(STM != sIdle, AddRoundKeyModule.io.state_out, Vec(initValues))
+  // InvMixColumns state
+  InvMixColumnsModule.io.state_in := AddRoundKeyModule.io.state_out
+
+  state := Mux(STM != sIdle, Mux((rounds > 0.U) & (rounds < Params.Nr.U), InvMixColumnsModule.io.state_out, AddRoundKeyModule.io.state_out), Vec(initValues))
 
   // Set state_out_valid true when cipher ends
   io.state_out_valid := rounds === Params.Nrplus1.U

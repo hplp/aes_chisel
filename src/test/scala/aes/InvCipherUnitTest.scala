@@ -3,10 +3,10 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
 
-class CipherUnitTester(c: Cipher) extends PeekPokeTester(c) {
+class InvCipherUnitTester(c: InvCipher) extends PeekPokeTester(c) {
 
-  private val aes_cipher = c
-  var state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
+  private val aes_icipher = c
+  var state = Array(137, 237, 94, 106, 5, 202, 118, 51, 129, 53, 8, 95, 226, 28, 64, 189)
   var roundKey = Array(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f)
   var expandedKey = Array(
     Array(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f),
@@ -21,54 +21,54 @@ class CipherUnitTester(c: Cipher) extends PeekPokeTester(c) {
     Array(0x54, 0x99, 0x32, 0xd1, 0xf0, 0x85, 0x57, 0x68, 0x10, 0x93, 0xed, 0x9c, 0xbe, 0x2c, 0x97, 0x4e),
     Array(0x13, 0x11, 0x1d, 0x7f, 0xe3, 0x94, 0x4a, 0x17, 0xf3, 0x07, 0xa7, 0x8b, 0x4d, 0x2b, 0x30, 0xc5))
 
-  poke(aes_cipher.io.start, 0)
+  poke(aes_icipher.io.start, 0)
   step(10) // test that things are fine in Idle state
 
   // send the plaintext
   for (i <- 0 until Params.stt_lng) {
-    poke(aes_cipher.io.plaintext(i), state(i))
+    poke(aes_icipher.io.plaintext(i), state(i))
   }
   // send the expanded key
   for (i <- 0 until Params.Nrplus1) {
     for (j <- 0 until Params.stt_lng)
-      poke(aes_cipher.io.expandedKey(i)(j), expandedKey(i)(j))
+      poke(aes_icipher.io.expandedKey(i)(j), expandedKey(i)(j))
   }
   // send start
-  poke(aes_cipher.io.start, 1)
+  poke(aes_icipher.io.start, 1)
   step(1)
 
   // reset start
-  poke(aes_cipher.io.start, 0)
+  poke(aes_icipher.io.start, 0)
   step(Params.Nrplus1)
 
-  var state_e = Array(137, 237, 94, 106, 5, 202, 118, 51, 129, 53, 8, 95, 226, 28, 64, 189)
+  var state_e = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
   for (i <- 0 until Params.stt_lng)
-    expect(aes_cipher.io.state_out(i), state_e(i))
-  expect(aes_cipher.io.state_out_valid, 1)
+    expect(aes_icipher.io.state_out(i), state_e(i))
+  expect(aes_icipher.io.state_out_valid, 1)
 
   step(10)
 }
 
-class CipherTester extends ChiselFlatSpec {
+class InvCipherTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "Cipher" should s"execute AES Cipher (with ${backendName})" in {
-      Driver(() => new Cipher, backendName) {
-        c => new CipherUnitTester(c)
+    "Inverse Cipher" should s"execute AES Inverse Cipher (with ${backendName})" in {
+      Driver(() => new InvCipher, backendName) {
+        c => new InvCipherUnitTester(c)
       } should be(true)
     }
   }
 
   "running with --is-verbose" should "show more about what's going on in the tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new Cipher) {
-      c => new CipherUnitTester(c)
+    iotesters.Driver.execute(Array("--is-verbose"), () => new InvCipher) {
+      c => new InvCipherUnitTester(c)
     } should be(true)
   }
 
   "running with --fint-write-vcd" should "create a vcd file from the test" in {
-    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new Cipher) {
-      c => new CipherUnitTester(c)
+    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new InvCipher) {
+      c => new InvCipherUnitTester(c)
     } should be(true)
   }
 }
