@@ -7,6 +7,7 @@
 
 ## Features
 * (more to come)
+* Compact AES Cipher and Inverse Cipher chisel implementation
 * IDE (eclipse) environment for Scala and Chisel
 
 ## Instructions
