@@ -2,6 +2,7 @@ package aes
 
 import chisel3._
 
+// implements InvShiftRows
 class InvShiftRows extends Module {
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.stt_lng, UInt(8.W)))

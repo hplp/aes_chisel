@@ -46,6 +46,9 @@ class InvSubBytesUnitTester(c: InvSubBytes) extends PeekPokeTester(c) {
     expect(aes_isb.io.state_out(i), state(i))
 }
 
+// Run test with:
+// sbt 'testOnly aes.InvSubBytesTester'
+
 class InvSubBytesTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {

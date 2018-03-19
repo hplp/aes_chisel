@@ -2,6 +2,7 @@ package aes
 
 import chisel3._
 
+// implements AddRoundKey
 class AddRoundKey extends Module {
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.stt_lng, UInt(8.W)))

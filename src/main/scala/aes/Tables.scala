@@ -2,6 +2,10 @@ package aes
 
 import chisel3._
 
+// This module is not used and the file can be deleted.
+// Rather than having the tables together in a large ROM
+// it was simpler to have them distributed in the modules where they are used
+
 object Tables extends Module {
   val io = IO(new Bundle {
   })

@@ -33,6 +33,9 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
     expect(aes_ark.io.state_out(i), state(i))
 }
 
+// Run test with:
+// sbt 'testOnly aes.AddRoundKeyTester'
+
 class AddRoundKeyTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {

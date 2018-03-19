@@ -3,6 +3,7 @@ package aes
 import chisel3._
 import chisel3.util._
 
+// implements AES_Decrypt
 class InvCipher extends Module {
   val io = IO(new Bundle {
     val plaintext = Input(Vec(Params.stt_lng, UInt(8.W)))

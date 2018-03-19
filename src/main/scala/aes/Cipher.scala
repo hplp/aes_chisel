@@ -3,6 +3,7 @@ package aes
 import chisel3._
 import chisel3.util._
 
+// implements AES_Encrypt
 class Cipher extends Module {
   val io = IO(new Bundle {
     val plaintext = Input(Vec(Params.stt_lng, UInt(8.W)))

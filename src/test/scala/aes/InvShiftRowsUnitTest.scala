@@ -45,6 +45,9 @@ class InvShiftRowsUnitTester(c: InvShiftRows) extends PeekPokeTester(c) {
     expect(aes_isr.io.state_out(i), state(i))
 }
 
+// Run test with:
+// sbt 'testOnly aes.InvShiftRowsTester'
+
 class InvShiftRowsTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {

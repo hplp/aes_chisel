@@ -46,6 +46,9 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
     expect(aes_sb.io.state_out(i), state(i))
 }
 
+// Run test with:
+// sbt 'testOnly aes.InvShiftRowsTester'
+
 class SubBytesTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {

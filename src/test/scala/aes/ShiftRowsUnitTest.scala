@@ -5,6 +5,7 @@ import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
 
 class ShiftRowsUnitTester(c: ShiftRows) extends PeekPokeTester(c) {
 
+  // ShiftRows in Scala
   def computeShiftRows(state_in: Array[Int]): Array[Int] = {
     var state_out = new Array[Int](Params.stt_lng)
 
@@ -38,12 +39,19 @@ class ShiftRowsUnitTester(c: ShiftRows) extends PeekPokeTester(c) {
     poke(aes_sr.io.state_in(i), state(i))
   step(1)
 
+  // run in Scala
   state = computeShiftRows(state)
   println(state.deep.mkString(" "))
 
+  // match chisel and Scala
   for (i <- 0 until Params.stt_lng)
     expect(aes_sr.io.state_out(i), state(i))
 }
+
+// Run with:
+//    sbt 'testOnly aes.ShiftRowsTester'
+// or sbt 'testOnly aes.ShiftRowsTester -- -z verbose'
+// or sbt 'testOnly aes.ShiftRowsTester -- -z vcd'
 
 class ShiftRowsTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
