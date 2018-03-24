@@ -50,6 +50,8 @@ class InvCipherUnitTester(c: InvCipher) extends PeekPokeTester(c) {
   step(10)
 }
 
+// Run test with:
+// sbt 'testOnly aes.InvCipherTester'
 class InvCipherTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {

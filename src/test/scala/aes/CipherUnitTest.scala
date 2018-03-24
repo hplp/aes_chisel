@@ -50,6 +50,9 @@ class CipherUnitTester(c: Cipher) extends PeekPokeTester(c) {
   step(10)
 }
 
+// Run test with:
+// sbt 'testOnly aes.CipherTester'
+
 class CipherTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
