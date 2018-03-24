@@ -24,9 +24,9 @@ class InvCipherUnitTester(c: InvCipher) extends PeekPokeTester(c) {
   poke(aes_icipher.io.start, 0)
   step(10) // test that things are fine in Idle state
 
-  // send the plaintext
+  // send the ciphertext
   for (i <- 0 until Params.stt_lng) {
-    poke(aes_icipher.io.plaintext(i), state(i))
+    poke(aes_icipher.io.ciphertext(i), state(i))
   }
   // send the expanded key
   for (i <- 0 until Params.Nrplus1) {

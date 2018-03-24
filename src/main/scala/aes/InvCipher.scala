@@ -6,7 +6,7 @@ import chisel3.util._
 // implements AES_Decrypt
 class InvCipher extends Module {
   val io = IO(new Bundle {
-    val plaintext = Input(Vec(Params.stt_lng, UInt(8.W)))
+    val ciphertext = Input(Vec(Params.stt_lng, UInt(8.W)))
     val expandedKey = Input(Vec(Params.Nrplus1, Vec(Params.stt_lng, UInt(8.W))))
     val start = Input(Bool())
     val state_out = Output(Vec(Params.stt_lng, UInt(8.W)))
@@ -50,7 +50,7 @@ class InvCipher extends Module {
   InvSubBytesModule.io.state_in := InvShiftRowsModule.io.state_out
 
   // AddRoundKey state
-  AddRoundKeyModule.io.state_in := Mux(STM === sInitialAR, io.plaintext, InvSubBytesModule.io.state_out)
+  AddRoundKeyModule.io.state_in := Mux(STM === sInitialAR, io.ciphertext, InvSubBytesModule.io.state_out)
   AddRoundKeyModule.io.roundKey := io.expandedKey(Params.Nr.U - rounds)
 
   // InvMixColumns state
