@@ -51,7 +51,7 @@ class Cipher extends Module {
 
   // MixColumns state
   MixColumnsModule.io.state_in := ShiftRowsModule.io.state_out
-  
+
   // AddRoundKey state
   AddRoundKeyModule.io.state_in := Mux(STM === sInitialAR, io.plaintext,
     Mux(rounds === Params.Nr.U, ShiftRowsModule.io.state_out, MixColumnsModule.io.state_out))
@@ -67,4 +67,8 @@ class Cipher extends Module {
   printf("STM: %d, rounds: %d, valid: %d\n", STM, rounds, io.state_out_valid)
   printf("state: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", state(0), state(1), state(2), state(3), state(4),
     state(5), state(6), state(7), state(8), state(9), state(10), state(11), state(12), state(13), state(14), state(15))
+}
+
+object Cipher {
+  def apply(): Cipher = Module(new Cipher())
 }

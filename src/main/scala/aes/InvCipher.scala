@@ -67,3 +67,7 @@ class InvCipher extends Module {
   printf("state: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", state(0), state(1), state(2), state(3), state(4),
     state(5), state(6), state(7), state(8), state(9), state(10), state(11), state(12), state(13), state(14), state(15))
 }
+
+object InvCipher {
+  def apply(): InvCipher = Module(new InvCipher())
+}
