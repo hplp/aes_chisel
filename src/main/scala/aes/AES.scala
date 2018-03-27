@@ -20,33 +20,23 @@ class AES extends Module {
   val CipherModule = Cipher()
   val InvCipherModule = InvCipher()
 
-  // The input text can go to both the cipher and the inverse cipher for now
-  CipherModule.io.plaintext := io.input_text
-  InvCipherModule.io.ciphertext := io.input_text
+  // Internal variables
+  val initValues = Seq.fill(Params.stt_lng) { 0.U(8.W) }
+  val output_valid = RegInit(Vec(initValues))
 
-  CipherModule.io.expandedKey := io.expandedKey
-  InvCipherModule.io.expandedKey := io.expandedKey
+  // The input text can go to both the cipher and the inverse cipher (for now)
+  CipherModule.io.plaintext <> io.input_text
+  CipherModule.io.expandedKey <> io.expandedKey
+  InvCipherModule.io.ciphertext <> io.input_text
+  InvCipherModule.io.expandedKey <> io.expandedKey
 
-  // The start is sent to either the cipher or the inverse cipher, based on AES_mode
-  when(io.start) {
-    when(!io.AES_mode) {
-      CipherModule.io.start := io.start
-      InvCipherModule.io.start := !io.start
-    }.otherwise {
-      CipherModule.io.start := !io.start
-      InvCipherModule.io.start := io.start
-    }
-  }.otherwise {
-    CipherModule.io.start := !io.start
-    InvCipherModule.io.start := !io.start
-  }
+  // Cipher starts at (start=1 and AES_Mode=0)
+  CipherModule.io.start := io.start && (!io.AES_mode)
+  // Inverse Cipher starts at (start=1 and AES_Mode=1)
+  InvCipherModule.io.start := io.start && (io.AES_mode)
 
-  // The state_out_valid determines which output to take
-  when(CipherModule.io.state_out_valid) {
-    io.output_valid := CipherModule.io.state_out_valid
-    io.output_text := CipherModule.io.state_out
-  }.elsewhen(InvCipherModule.io.state_out_valid) {
-    io.output_valid := InvCipherModule.io.state_out_valid
-    io.output_text := InvCipherModule.io.state_out
-  }
+  // AES output_valid can be the Cipher.output_valid OR InvCipher.output_valid
+  io.output_valid := CipherModule.io.state_out_valid || InvCipherModule.io.state_out_valid
+  // AES output can be managed using a Mux on the Cipher output and the InvCipher output
+  io.output_text <> Mux(CipherModule.io.state_out_valid, CipherModule.io.state_out, InvCipherModule.io.state_out)
 }

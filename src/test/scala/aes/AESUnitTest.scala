@@ -21,36 +21,34 @@ class AESUnitTester(c: AES) extends PeekPokeTester(c) {
     Array(0x54, 0x99, 0x32, 0xd1, 0xf0, 0x85, 0x57, 0x68, 0x10, 0x93, 0xed, 0x9c, 0xbe, 0x2c, 0x97, 0x4e),
     Array(0x13, 0x11, 0x1d, 0x7f, 0xe3, 0x94, 0x4a, 0x17, 0xf3, 0x07, 0xa7, 0x8b, 0x4d, 0x2b, 0x30, 0xc5))
 
-  poke(aes.io.AES_mode, 0)
-
+  poke(aes.io.AES_mode, 0) // cipher
   poke(aes.io.start, 0)
   step(10) // test that things are fine in Idle state
 
   // send the plaintext
-//  for (i <- 0 until Params.stt_lng) {
-//    poke(aes.io.input_text(i), input_text(i))
-//  }
+  for (i <- 0 until Params.stt_lng) {
+    poke(aes.io.input_text(i), input_text(i))
+  }
   // send the expanded key
-//  for (i <- 0 until Params.Nrplus1) {
-//    for (j <- 0 until Params.stt_lng)
-//      poke(aes.io.expandedKey(i)(j), expandedKey(i)(j))
-//  }
+  for (i <- 0 until Params.Nrplus1) {
+    for (j <- 0 until Params.stt_lng)
+      poke(aes.io.expandedKey(i)(j), expandedKey(i)(j))
+  }
   // send start
   poke(aes.io.start, 1)
   step(1)
 
   // reset start
   poke(aes.io.start, 0)
-  step(1)
-  //step(Params.Nrplus1)
+  step(Params.Nrplus1)
 
-//  var state_e = Array(137, 237, 94, 106, 5, 202, 118, 51, 129, 53, 8, 95, 226, 28, 64, 189)
+  var state_e = Array(137, 237, 94, 106, 5, 202, 118, 51, 129, 53, 8, 95, 226, 28, 64, 189)
 
-//  for (i <- 0 until Params.stt_lng)
-//    expect(aes.io.output_text(i), state_e(i))
-//  expect(aes.io.output_valid, 1)
+  for (i <- 0 until Params.stt_lng)
+    expect(aes.io.output_text(i), state_e(i))
+  expect(aes.io.output_valid, 1)
 
-//  step(10)
+  step(10)
 }
 
 // Run test with:
