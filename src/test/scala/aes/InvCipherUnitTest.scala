@@ -25,12 +25,12 @@ class InvCipherUnitTester(c: InvCipher) extends PeekPokeTester(c) {
   step(10) // test that things are fine in Idle state
 
   // send the ciphertext
-  for (i <- 0 until Params.stt_lng) {
+  for (i <- 0 until Params.StateLength) {
     poke(aes_icipher.io.ciphertext(i), state(i))
   }
   // send the expanded key
   for (i <- 0 until Params.Nrplus1) {
-    for (j <- 0 until Params.stt_lng)
+    for (j <- 0 until Params.StateLength)
       poke(aes_icipher.io.expandedKey(i)(j), expandedKey(i)(j))
   }
   // send start
@@ -43,7 +43,7 @@ class InvCipherUnitTester(c: InvCipher) extends PeekPokeTester(c) {
 
   var state_e = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     expect(aes_icipher.io.state_out(i), state_e(i))
   expect(aes_icipher.io.state_out_valid, 1)
 
@@ -52,6 +52,8 @@ class InvCipherUnitTester(c: InvCipher) extends PeekPokeTester(c) {
 
 // Run test with:
 // sbt 'testOnly aes.InvCipherTester'
+// extend with the option '-- -z verbose' or '-- -z vcd' for specific test
+
 class InvCipherTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {

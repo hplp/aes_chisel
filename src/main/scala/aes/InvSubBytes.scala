@@ -5,8 +5,8 @@ import chisel3._
 // implements InvSubBytes
 class InvSubBytes extends Module {
   val io = IO(new Bundle {
-    val state_in = Input(Vec(Params.stt_lng, UInt(8.W)))
-    val state_out = Output(Vec(Params.stt_lng, UInt(8.W)))
+    val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
+    val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
   })
 
   val inverted_s_box = Vec(Array(
@@ -27,7 +27,7 @@ class InvSubBytes extends Module {
     0xa0.U, 0xe0.U, 0x3b.U, 0x4d.U, 0xae.U, 0x2a.U, 0xf5.U, 0xb0.U, 0xc8.U, 0xeb.U, 0xbb.U, 0x3c.U, 0x83.U, 0x53.U, 0x99.U, 0x61.U,
     0x17.U, 0x2b.U, 0x04.U, 0x7e.U, 0xba.U, 0x77.U, 0xd6.U, 0x26.U, 0xe1.U, 0x69.U, 0x14.U, 0x63.U, 0x55.U, 0x21.U, 0x0c.U, 0x7d.U))
 
-  for (i <- 0 until Params.stt_lng) {
+  for (i <- 0 until Params.StateLength) {
     io.state_out(i) := inverted_s_box(io.state_in(i))
   }
 }

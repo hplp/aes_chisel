@@ -9,10 +9,10 @@ class AES extends Module {
     val AES_mode = Input(Bool()) // 00=cipher, 01=inverse cipher, later version: 10=key update
     val start = Input(Bool())
     //
-    val input_text = Input(Vec(Params.stt_lng, UInt(8.W))) // plaintext, ciphertext or expanded key
-    val expandedKey = Input(Vec(Params.Nrplus1, Vec(Params.stt_lng, UInt(8.W)))) // for now, send the expanded key
+    val input_text = Input(Vec(Params.StateLength, UInt(8.W))) // plaintext, ciphertext or expanded key
+    val expandedKey = Input(Vec(Params.Nrplus1, Vec(Params.StateLength, UInt(8.W)))) // for now, send the expanded key
     //
-    val output_text = Output(Vec(Params.stt_lng, UInt(8.W))) // ciphertext or plaintext
+    val output_text = Output(Vec(Params.StateLength, UInt(8.W))) // ciphertext or plaintext
     val output_valid = Output(Bool())
   })
 
@@ -21,7 +21,7 @@ class AES extends Module {
   val InvCipherModule = InvCipher()
 
   // Internal variables
-  val initValues = Seq.fill(Params.stt_lng) { 0.U(8.W) }
+  val initValues = Seq.fill(Params.StateLength) { 0.U(8.W) }
   val output_valid = RegInit(Vec(initValues))
 
   // The input text can go to both the cipher and the inverse cipher (for now)

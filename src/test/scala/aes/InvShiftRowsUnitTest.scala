@@ -6,7 +6,7 @@ import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
 class InvShiftRowsUnitTester(c: InvShiftRows) extends PeekPokeTester(c) {
 
   def computeInvShiftRows(state_in: Array[Int]): Array[Int] = {
-    var state_out = new Array[Int](Params.stt_lng)
+    var state_out = new Array[Int](Params.StateLength)
 
     state_out(0) = state_in(0)
     state_out(1) = state_in(13)
@@ -34,19 +34,20 @@ class InvShiftRowsUnitTester(c: InvShiftRows) extends PeekPokeTester(c) {
   private val aes_isr = c
   var state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     poke(aes_isr.io.state_in(i), state(i))
   step(1)
 
   state = computeInvShiftRows(state)
   println(state.deep.mkString(" "))
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     expect(aes_isr.io.state_out(i), state(i))
 }
 
 // Run test with:
 // sbt 'testOnly aes.InvShiftRowsTester'
+// extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class InvShiftRowsTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")

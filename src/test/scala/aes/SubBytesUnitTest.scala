@@ -24,9 +24,9 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
       0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
       0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16)
 
-    var state_out = new Array[Int](Params.stt_lng)
+    var state_out = new Array[Int](Params.StateLength)
 
-    for (i <- 0 until Params.stt_lng) {
+    for (i <- 0 until Params.StateLength) {
       state_out(i) = s_box(state_in(i))
     }
     state_out
@@ -35,19 +35,20 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
   private val aes_sb = c
   var state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     poke(aes_sb.io.state_in(i), state(i))
   step(1)
 
   state = computeSubBytes(state)
   println(state.deep.mkString(" "))
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     expect(aes_sb.io.state_out(i), state(i))
 }
 
 // Run test with:
 // sbt 'testOnly aes.InvShiftRowsTester'
+// extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class SubBytesTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")

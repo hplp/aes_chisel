@@ -6,7 +6,7 @@ import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
 class MixColumnsUnitTester(c: MixColumns) extends PeekPokeTester(c) {
 
   def computeMixColumns(state_in: Array[Int]): Array[Int] = {
-    var state_out = new Array[Int](Params.stt_lng)
+    var state_out = new Array[Int](Params.StateLength)
 
     var mul02 = Array(
       0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e, 0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e,
@@ -144,19 +144,20 @@ class MixColumnsUnitTester(c: MixColumns) extends PeekPokeTester(c) {
   private val aes_mc = c
   var state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     poke(aes_mc.io.state_in(i), state(i))
   step(1)
 
   state = computeMixColumns(state)
   println(state.deep.mkString(" "))
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     expect(aes_mc.io.state_out(i), state(i))
 }
 
 // Run test with:
 // sbt 'testOnly aes.MixColumnsTester'
+// extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class MixColumnsTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")

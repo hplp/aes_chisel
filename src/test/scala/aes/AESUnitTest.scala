@@ -26,12 +26,12 @@ class AESUnitTester(c: AES) extends PeekPokeTester(c) {
   step(10) // test that things are fine in Idle state
 
   // send the plaintext
-  for (i <- 0 until Params.stt_lng) {
+  for (i <- 0 until Params.StateLength) {
     poke(aes.io.input_text(i), input_text(i))
   }
   // send the expanded key
   for (i <- 0 until Params.Nrplus1) {
-    for (j <- 0 until Params.stt_lng)
+    for (j <- 0 until Params.StateLength)
       poke(aes.io.expandedKey(i)(j), expandedKey(i)(j))
   }
   // send start
@@ -44,7 +44,7 @@ class AESUnitTester(c: AES) extends PeekPokeTester(c) {
 
   var state_e = Array(137, 237, 94, 106, 5, 202, 118, 51, 129, 53, 8, 95, 226, 28, 64, 189)
 
-  for (i <- 0 until Params.stt_lng)
+  for (i <- 0 until Params.StateLength)
     expect(aes.io.output_text(i), state_e(i))
   expect(aes.io.output_valid, 1)
 
@@ -53,6 +53,8 @@ class AESUnitTester(c: AES) extends PeekPokeTester(c) {
 
 // Run test with:
 // sbt 'testOnly aes.AESTester'
+// sbt 'testOnly aes.AESTester -- -z verbose'
+// sbt 'testOnly aes.AESTester -- -z vcd'
 
 class AESTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")

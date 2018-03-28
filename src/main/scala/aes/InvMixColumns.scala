@@ -5,8 +5,8 @@ import chisel3._
 // implements InvMixColumns
 class InvMixColumns extends Module {
   val io = IO(new Bundle {
-    val state_in = Input(Vec(Params.stt_lng, UInt(8.W)))
-    val state_out = Output(Vec(Params.stt_lng, UInt(8.W)))
+    val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
+    val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
   })
 
   /*
