@@ -1,13 +1,13 @@
 # Implementation of the Advanced Encryption Standard (AES) in [Chisel](https://chisel.eecs.berkeley.edu/)
-=======================
+
 
 ## Motivation
-* Provide a chisel implementation of the cipher that can be used in other projects
+* Equip developers with ready-to-use, parameterizable, encryption macros
 * Compare performance, area, and power, of generated HDL with pure Verilog
 
 ## Features
 * (more to come)
-* Compact AES Cipher and Inverse Cipher chisel implementation
+* Compact AES Cipher and Inverse Cipher Chisel implementation
 * IDE (eclipse) environment for Scala and Chisel
 
 ## Instructions
