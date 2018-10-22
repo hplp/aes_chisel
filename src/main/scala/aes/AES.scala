@@ -21,7 +21,9 @@ class AES extends Module {
   val InvCipherModule = InvCipher()
 
   // Internal variables
-  val initValues = Seq.fill(Params.StateLength) { 0.U(8.W) }
+  val initValues = Seq.fill(Params.StateLength) {
+    0.U(8.W)
+  }
   val output_valid = RegInit(Vec(initValues))
 
   // The input text can go to both the cipher and the inverse cipher (for now)

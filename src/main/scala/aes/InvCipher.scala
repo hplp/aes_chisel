@@ -20,8 +20,10 @@ class InvCipher extends Module {
   val InvMixColumnsModule = InvMixColumns()
 
   // Internal variables
-  val initValues = Seq.fill(Params.StateLength) { 0.U(8.W) }
-  val state = RegInit(Vec(initValues))
+  val initValues = Seq.fill(Params.StateLength) {
+    0.U(8.W)
+  }
+  val state = RegInit(VecInit(initValues))
   val rounds = RegInit(0.U(4.W))
 
   // STM
@@ -30,7 +32,9 @@ class InvCipher extends Module {
 
   switch(STM) {
     is(sIdle) {
-      when(io.start) { STM := sInitialAR } // Start cipher
+      when(io.start) {
+        STM := sInitialAR
+      } // Start cipher
       rounds := 0.U
     }
     is(sInitialAR) {
@@ -39,7 +43,9 @@ class InvCipher extends Module {
     }
     is(sBusy) {
       rounds := rounds + 1.U
-      when(rounds === Params.Nr.U) { STM := sIdle }
+      when(rounds === Params.Nr.U) {
+        STM := sIdle
+      }
     }
   }
 
@@ -56,7 +62,7 @@ class InvCipher extends Module {
   // InvMixColumns state
   InvMixColumnsModule.io.state_in := AddRoundKeyModule.io.state_out
 
-  state := Mux(STM != sIdle, Mux((rounds > 0.U) & (rounds < Params.Nr.U), InvMixColumnsModule.io.state_out, AddRoundKeyModule.io.state_out), Vec(initValues))
+  state := Mux(STM =/= sIdle, Mux((rounds > 0.U) & (rounds < Params.Nr.U), InvMixColumnsModule.io.state_out, AddRoundKeyModule.io.state_out), VecInit(initValues))
 
   // Set state_out_valid true when cipher ends
   io.state_out_valid := rounds === Params.Nrplus1.U
