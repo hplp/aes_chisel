@@ -1,33 +1,34 @@
 # script to run all tests at once
 
-echo "SubBytesTester"
+echo -e "SubBytesTester:\n"
 sbt 'testOnly aes.SubBytesTester'
 
-echo "ShiftRowsTester"
+echo -e "ShiftRowsTester:\n"
 sbt 'testOnly aes.ShiftRowsTester'
 
-echo "MixColumnsTester"
+echo -e "MixColumnsTester:\n"
 sbt 'testOnly aes.MixColumnsTester'
 
-echo "InvSubBytesTester"
+echo -e "InvSubBytesTester:\n"
 sbt 'testOnly aes.InvSubBytesTester'
 
-echo "InvShiftRowsTester"
+echo -e "InvShiftRowsTester:\n"
 sbt 'testOnly aes.InvShiftRowsTester'
 
-echo ""
+echo -e "InvMixColumnsTester:\n"
 sbt 'testOnly aes.InvMixColumnsTester'
 
-echo "InvMixColumnsTester"
+echo -e "AddRoundKeyTester:\n"
 sbt 'testOnly aes.AddRoundKeyTester'
 
-echo "CipherTester"
+echo -e "CipherTester:\n"
 sbt 'testOnly aes.CipherTester'
 
-echo "InvCipherTester"
+echo -e "InvCipherTester:\n"
 sbt 'testOnly aes.InvCipherTester'
 
-echo "AESTester"
+echo -e "AESTester:\n"
 sbt 'testOnly aes.AESTester'
 
 
+echo "Tests Finished!"
