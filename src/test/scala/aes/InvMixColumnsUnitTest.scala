@@ -1,7 +1,7 @@
 package aes
 
 import chisel3.iotesters
-import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
+import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 class InvMixColumnsUnitTester(c: InvMixColumns) extends PeekPokeTester(c) {
 

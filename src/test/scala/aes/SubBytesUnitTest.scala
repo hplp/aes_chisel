@@ -1,7 +1,7 @@
 package aes
 
 import chisel3.iotesters
-import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
+import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
 
@@ -47,7 +47,7 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
 }
 
 // Run test with:
-// sbt 'testOnly aes.InvShiftRowsTester'
+// sbt 'testOnly aes.SubBytesTester'
 // extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class SubBytesTester extends ChiselFlatSpec {
