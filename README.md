@@ -8,7 +8,7 @@
 ## Features
 * (more to come)
 * Compact AES Cipher and Inverse Cipher Chisel implementation
-* IDE (eclipse) environment for Scala and Chisel
+* IDE (IntelliJ) environment for Scala and Chisel
 
 ## Instructions
 * Generated Verilog will be in directory _/test_run_dir_
