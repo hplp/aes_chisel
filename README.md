@@ -14,5 +14,6 @@
 * Generated Verilog will be in directory _/test_run_dir_
 
 ## References
-* This project was created using the [chisel-template](https://github.com/ucb-bar/chisel-template) from [ucb-bar](https://github.com/ucb-bar)
+* This project was created using the [chisel-template](https://github.com/freechipsproject/chisel-template) from [freechipsproject](https://github.com/freechipsproject)
+* Best resource for learning Chisel: [chisel-bootcamp](https://github.com/freechipsproject/chisel-bootcamp)
 * Useful and highly recommeded [Scala class on coursera](https://www.coursera.org/learn/progfun1)
