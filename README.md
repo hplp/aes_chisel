@@ -12,6 +12,7 @@
 
 ## Instructions
 * Generated Verilog will be in directory _/test_run_dir_
+* Either [gtkwave](http://gtkwave.sourceforge.net/) or [dinotrace](https://www.veripool.org/wiki/dinotrace) (or other wave viewer) can be used to display _.vcd_ files
 
 ## References
 * This project was created using the [chisel-template](https://github.com/freechipsproject/chisel-template) from [freechipsproject](https://github.com/freechipsproject)
