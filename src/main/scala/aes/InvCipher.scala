@@ -81,5 +81,5 @@ class InvCipher(Nk: Int) extends Module {
 }
 
 object InvCipher {
-  def apply(): InvCipher = Module(new InvCipher(4))
+  def apply(Nk: Int): InvCipher = Module(new InvCipher(Nk))
 }

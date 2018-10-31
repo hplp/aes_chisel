@@ -8,7 +8,7 @@ class InvCipherUnitTester(c: InvCipher, Nk: Int) extends PeekPokeTester(c) {
 
   private val aes_icipher = c
 
-  val KeyLength = Nk * aes.Params.rows
+  val KeyLength = Nk * Params.rows
   val Nr = Nk + 6 // 10, 12, 14 rounds
   val Nrplus1 = Nr + 1 // 10+1, 12+1, 14+1
 
@@ -74,6 +74,7 @@ class InvCipherUnitTester(c: InvCipher, Nk: Int) extends PeekPokeTester(c) {
     case 6 => roundKey192
     case 8 => roundKey256
   }
+
   val expandedKey = Nk match {
     case 4 => expandedKey128
     case 6 => expandedKey192
@@ -100,7 +101,7 @@ class InvCipherUnitTester(c: InvCipher, Nk: Int) extends PeekPokeTester(c) {
   poke(aes_icipher.io.start, 0)
   step(Nrplus1)
 
-  var state_e = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
+  val state_e = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
   for (i <- 0 until Params.StateLength)
     expect(aes_icipher.io.state_out(i), state_e(i))

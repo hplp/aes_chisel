@@ -8,7 +8,7 @@ class CipherUnitTester(c: Cipher, Nk: Int) extends PeekPokeTester(c) {
 
   private val aes_cipher = c
 
-  val KeyLength = Nk * aes.Params.rows
+  val KeyLength = Nk * Params.rows
   val Nr = Nk + 6 // 10, 12, 14 rounds
   val Nrplus1 = Nr + 1 // 10+1, 12+1, 14+1
 
@@ -67,14 +67,17 @@ class CipherUnitTester(c: Cipher, Nk: Int) extends PeekPokeTester(c) {
     case 6 => roundKey192
     case 8 => roundKey256
   }
+
   val expandedKey = Nk match {
     case 4 => expandedKey128
     case 6 => expandedKey192
     case 8 => expandedKey256
   }
+
   val state_e128 = Array(0x89, 0xed, 0x5e, 0x6a, 0x05, 0xca, 0x76, 0x33, 0x81, 0x35, 0x08, 0x5f, 0xe2, 0x1c, 0x40, 0xbd)
   val state_e192 = Array(0xbc, 0x3a, 0xaa, 0xb5, 0xd9, 0x7b, 0xaa, 0x7b, 0x32, 0x5d, 0x7b, 0x8f, 0x69, 0xcd, 0x7c, 0xa8)
   val state_e256 = Array(0x9a, 0x19, 0x88, 0x30, 0xff, 0x9a, 0x4e, 0x39, 0xec, 0x15, 0x01, 0x54, 0x7d, 0x4a, 0x6b, 0x1b)
+
   val state_e = Nk match {
     case 4 => state_e128
     case 6 => state_e192
