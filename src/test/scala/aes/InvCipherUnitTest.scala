@@ -8,9 +8,9 @@ class InvCipherUnitTester(c: InvCipher, Nk: Int) extends PeekPokeTester(c) {
 
   private val aes_icipher = c
 
-  val KeyLength = Nk * Params.rows
-  val Nr = Nk + 6 // 10, 12, 14 rounds
-  val Nrplus1 = Nr + 1 // 10+1, 12+1, 14+1
+  val KeyLength: Int = Nk * Params.rows
+  val Nr: Int = Nk + 6 // 10, 12, 14 rounds
+  val Nrplus1: Int = Nr + 1 // 10+1, 12+1, 14+1
 
   val state128 = Array(0x89, 0xed, 0x5e, 0x6a, 0x05, 0xca, 0x76, 0x33, 0x81, 0x35, 0x08, 0x5f, 0xe2, 0x1c, 0x40, 0xbd)
   val state192 = Array(0xbc, 0x3a, 0xaa, 0xb5, 0xd9, 0x7b, 0xaa, 0x7b, 0x32, 0x5d, 0x7b, 0x8f, 0x69, 0xcd, 0x7c, 0xa8)
@@ -115,10 +115,10 @@ class InvCipherUnitTester(c: InvCipher, Nk: Int) extends PeekPokeTester(c) {
 // extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class InvCipherTester extends ChiselFlatSpec {
-  val Nk = 4 // 4, 6, 8 [32-bit words] columns in cipher key
+  val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "Inverse Cipher" should s"execute AES Inverse Cipher (with ${backendName})" in {
+    "Inverse Cipher" should s"execute AES Inverse Cipher (with $backendName)" in {
       Driver(() => new InvCipher(Nk), backendName) {
         c => new InvCipherUnitTester(c, Nk)
       } should be(true)

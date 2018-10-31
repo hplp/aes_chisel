@@ -162,7 +162,7 @@ class InvMixColumnsUnitTester(c: InvMixColumns) extends PeekPokeTester(c) {
 class InvMixColumnsTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "InvMixColumns" should s"execute AES InvMixColumns (with ${backendName})" in {
+    "InvMixColumns" should s"execute AES InvMixColumns (with $backendName)" in {
       Driver(() => new InvMixColumns, backendName) {
         c => new InvMixColumnsUnitTester(c)
       } should be(true)

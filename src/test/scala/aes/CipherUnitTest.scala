@@ -8,9 +8,9 @@ class CipherUnitTester(c: Cipher, Nk: Int) extends PeekPokeTester(c) {
 
   private val aes_cipher = c
 
-  val KeyLength = Nk * Params.rows
-  val Nr = Nk + 6 // 10, 12, 14 rounds
-  val Nrplus1 = Nr + 1 // 10+1, 12+1, 14+1
+  val KeyLength: Int = Nk * Params.rows
+  val Nr: Int = Nk + 6 // 10, 12, 14 rounds
+  val Nrplus1: Int = Nr + 1 // 10+1, 12+1, 14+1
 
   val state = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
 
@@ -116,10 +116,10 @@ class CipherUnitTester(c: Cipher, Nk: Int) extends PeekPokeTester(c) {
 // extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class CipherTester extends ChiselFlatSpec {
-  val Nk = 4 // 4, 6, 8 [32-bit words] columns in cipher key
+  val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "Cipher" should s"execute AES Cipher (with ${backendName})" in {
+    "Cipher" should s"execute AES Cipher (with $backendName)" in {
       Driver(() => new Cipher(Nk), backendName) {
         c => new CipherUnitTester(c, Nk)
       } should be(true)

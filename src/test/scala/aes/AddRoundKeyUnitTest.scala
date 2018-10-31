@@ -40,7 +40,7 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
 class AddRoundKeyTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "AddRoundKey" should s"execute AES AddRoundKey (with ${backendName})" in {
+    "AddRoundKey" should s"execute AES AddRoundKey (with $backendName)" in {
       Driver(() => new AddRoundKey, backendName) {
         c => new AddRoundKeyUnitTester(c)
       } should be(true)

@@ -162,7 +162,7 @@ class MixColumnsUnitTester(c: MixColumns) extends PeekPokeTester(c) {
 class MixColumnsTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "MixColumns" should s"execute AES MixColumns (with ${backendName})" in {
+    "MixColumns" should s"execute AES MixColumns (with $backendName)" in {
       Driver(() => new MixColumns, backendName) {
         c => new MixColumnsUnitTester(c)
       } should be(true)

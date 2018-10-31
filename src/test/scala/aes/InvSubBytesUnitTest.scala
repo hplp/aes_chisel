@@ -53,7 +53,7 @@ class InvSubBytesUnitTester(c: InvSubBytes) extends PeekPokeTester(c) {
 class InvSubBytesTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "InvSubBytes" should s"execute AES InvSubBytes (with ${backendName})" in {
+    "InvSubBytes" should s"execute AES InvSubBytes (with $backendName)" in {
       Driver(() => new InvSubBytes, backendName) {
         c => new InvSubBytesUnitTester(c)
       } should be(true)

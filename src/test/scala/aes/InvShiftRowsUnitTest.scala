@@ -52,7 +52,7 @@ class InvShiftRowsUnitTester(c: InvShiftRows) extends PeekPokeTester(c) {
 class InvShiftRowsTester extends ChiselFlatSpec {
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
-    "InvShiftRows" should s"execute AES InvShiftRows (with ${backendName})" in {
+    "InvShiftRows" should s"execute AES InvShiftRows (with $backendName)" in {
       Driver(() => new InvShiftRows, backendName) {
         c => new InvShiftRowsUnitTester(c)
       } should be(true)

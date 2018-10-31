@@ -1,15 +1,14 @@
 package aes
 
 import chisel3._
-import chisel3.util._
 
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
 class AES(Nk: Int) extends Module {
   require(Nk == 4 || Nk == 6 || Nk == 8)
-  val KeyLength = Nk * Params.rows
-  val Nr = Nk + 6 // 10, 12, 14 rounds
-  val Nrplus1 = Nr + 1 // 10+1, 12+1, 14+1
+  val KeyLength: Int = Nk * Params.rows
+  val Nr: Int = Nk + 6 // 10, 12, 14 rounds
+  val Nrplus1: Int = Nr + 1 // 10+1, 12+1, 14+1
 
   val io = IO(new Bundle {
     val AES_mode = Input(Bool()) // 00=cipher, 01=inverse cipher, later version: 10=key update

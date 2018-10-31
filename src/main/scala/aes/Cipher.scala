@@ -7,9 +7,9 @@ import chisel3.util._
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
 class Cipher(Nk: Int) extends Module {
   require(Nk == 4 || Nk == 6 || Nk == 8)
-  val KeyLength = Nk * Params.rows
-  val Nr = Nk + 6 // 10, 12, 14 rounds
-  val Nrplus1 = Nr + 1 // 10+1, 12+1, 14+1
+  val KeyLength: Int = Nk * Params.rows
+  val Nr: Int = Nk + 6 // 10, 12, 14 rounds
+  val Nrplus1: Int = Nr + 1 // 10+1, 12+1, 14+1
 
   val io = IO(new Bundle {
     val plaintext = Input(Vec(Params.StateLength, UInt(8.W)))
