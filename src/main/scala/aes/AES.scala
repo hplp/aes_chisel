@@ -49,3 +49,7 @@ class AES(Nk: Int) extends Module {
   // AES output can be managed using a Mux on the Cipher output and the InvCipher output
   io.output_text <> Mux(CipherModule.io.state_out_valid, CipherModule.io.state_out, InvCipherModule.io.state_out)
 }
+
+object AES {
+  def apply(Nk: Int): AES = Module(new AES(Nk))
+}
