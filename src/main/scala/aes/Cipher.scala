@@ -14,6 +14,7 @@ class Cipher(Nk: Int) extends Module {
   val io = IO(new Bundle {
     val plaintext = Input(Vec(Params.StateLength, UInt(8.W)))
     val expandedKey = Input(Vec(Nrplus1, Vec(Params.StateLength, UInt(8.W))))
+    val roundKey = Input(Vec(Params.StateLength, UInt(8.W)))
     val start = Input(Bool())
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
     val state_out_valid = Output(Bool())
@@ -67,7 +68,7 @@ class Cipher(Nk: Int) extends Module {
   // AddRoundKey state
   AddRoundKeyModule.io.state_in := Mux(STM === sInitialAR, io.plaintext,
     Mux(rounds === Nr.U, ShiftRowsModule.io.state_out, MixColumnsModule.io.state_out))
-  AddRoundKeyModule.io.roundKey := io.expandedKey(rounds)
+  AddRoundKeyModule.io.roundKey := io.roundKey
 
   state := Mux(STM =/= sIdle, AddRoundKeyModule.io.state_out, VecInit(initValues))
 
