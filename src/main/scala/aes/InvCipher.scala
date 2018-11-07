@@ -13,7 +13,6 @@ class InvCipher(Nk: Int) extends Module {
 
   val io = IO(new Bundle {
     val ciphertext = Input(Vec(Params.StateLength, UInt(8.W)))
-    val expandedKey = Input(Vec(Nrplus1, Vec(Params.StateLength, UInt(8.W))))
     val roundKey = Input(Vec(Params.StateLength, UInt(8.W)))
     val start = Input(Bool())
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))

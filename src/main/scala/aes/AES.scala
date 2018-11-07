@@ -14,8 +14,8 @@ class AES(Nk: Int) extends Module {
     val AES_mode = Input(Bool()) // 00=cipher, 01=inverse cipher, later version: 10=key update
     val start = Input(Bool())
     //
-    val input_text = Input(Vec(Params.StateLength, UInt(8.W))) // plaintext, ciphertext or expanded key
-    val expandedKey = Input(Vec(Nrplus1, Vec(Params.StateLength, UInt(8.W)))) // for now, send the expanded key
+    val input_text = Input(Vec(Params.StateLength, UInt(8.W))) // plaintext, ciphertext
+    val roundKey = Input(Vec(Params.StateLength, UInt(8.W))) // single roundKey
     //
     val output_text = Output(Vec(Params.StateLength, UInt(8.W))) // ciphertext or plaintext
     val output_valid = Output(Bool())
@@ -24,8 +24,14 @@ class AES(Nk: Int) extends Module {
   // Instantiate module objects
   val CipherModule = Cipher(Nk)
   val InvCipherModule = InvCipher(Nk)
-  //  val CipherModule = new Cipher(Nk)
-  //  val InvCipherModule = new InvCipher(Nk)
+
+  // Create a synchronous-read, synchronous-write memory block big enough for any key length
+  // A roundKey is 16 bytes, and 1+(10/12/14) of them are needed
+//  val address = Wire(UInt(4.W))
+//  val dataIn = Wire(UInt((Params.StateLength * 8).W))
+//  val dataOut = Wire(UInt((Params.StateLength * 8).W))
+//  val enable = Wire(Bool())
+//  val expandedKeyMem = SyncReadMem(16, UInt((Params.StateLength * 8).W))
 
   // Internal variables
   val initValues = Seq.fill(Params.StateLength) {
@@ -35,9 +41,9 @@ class AES(Nk: Int) extends Module {
 
   // The input text can go to both the cipher and the inverse cipher (for now)
   CipherModule.io.plaintext <> io.input_text
-  CipherModule.io.expandedKey <> io.expandedKey
+  CipherModule.io.roundKey <> io.roundKey
   InvCipherModule.io.ciphertext <> io.input_text
-  InvCipherModule.io.expandedKey <> io.expandedKey
+  InvCipherModule.io.roundKey <> io.roundKey
 
   // Cipher starts at (start=1 and AES_Mode=0)
   CipherModule.io.start := io.start && (!io.AES_mode)
