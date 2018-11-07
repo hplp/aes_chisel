@@ -14,6 +14,7 @@ class InvCipher(Nk: Int) extends Module {
   val io = IO(new Bundle {
     val ciphertext = Input(Vec(Params.StateLength, UInt(8.W)))
     val expandedKey = Input(Vec(Nrplus1, Vec(Params.StateLength, UInt(8.W))))
+    val roundKey = Input(Vec(Params.StateLength, UInt(8.W)))
     val start = Input(Bool())
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
     val state_out_valid = Output(Bool())
@@ -63,7 +64,7 @@ class InvCipher(Nk: Int) extends Module {
 
   // AddRoundKey state
   AddRoundKeyModule.io.state_in := Mux(STM === sInitialAR, io.ciphertext, InvSubBytesModule.io.state_out)
-  AddRoundKeyModule.io.roundKey := io.expandedKey(Nr.U - rounds)
+  AddRoundKeyModule.io.roundKey := io.roundKey
 
   // InvMixColumns state
   InvMixColumnsModule.io.state_in := AddRoundKeyModule.io.state_out
