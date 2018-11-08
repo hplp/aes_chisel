@@ -74,6 +74,13 @@ class AESUnitTester(c: AES, Nk: Int) extends PeekPokeTester(c) {
     case 8 => expandedKey256
   }
 
+  poke(aes_i.io.AES_mode, 2) // configure key
+  poke(aes_i.io.start, 1)
+  poke(aes_i.io.input_text(0), 5)
+  //poke(aes_i.io.input_text(0), 5)
+  //poke(aes_i.io.input_text(0), 5)
+  step(4)
+
   poke(aes_i.io.AES_mode, 0) // cipher
   poke(aes_i.io.start, 0)
   step(4) // test that things are fine in Idle state

@@ -2,6 +2,7 @@ package aes
 
 import chisel3._
 import chisel3.util.log2Ceil
+import chisel3.util.Cat
 
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
@@ -31,8 +32,14 @@ class AES(Nk: Int) extends Module {
   // A roundKey is Params.StateLength bytes, and 1+(10/12/14) (< EKDepth) of them are needed
   val expandedKeyMem = SyncReadMem(EKDepth, UInt((Params.StateLength * 8).W))
   val address = RegInit(0.U(log2Ceil(EKDepth).W))
-  val dataIn = RegInit(0.U((Params.StateLength * 8).W))
+  //val dataIn = RegInit(0.U((Params.StateLength * 8).W))
   val dataOut = RegInit(0.U((Params.StateLength * 8).W))
+
+  when(io.AES_mode(1)) {
+    expandedKeyMem(address) := Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
+  }
+  dataOut := expandedKeyMem(address)
+  printf("expandedKeyMem dataOut %x\n", dataOut)
 
   // The input text can go to both the cipher and the inverse cipher (for now)
   CipherModule.io.plaintext <> io.input_text
