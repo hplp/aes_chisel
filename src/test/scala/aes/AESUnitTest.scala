@@ -75,10 +75,11 @@ class AESUnitTester(c: AES, Nk: Int) extends PeekPokeTester(c) {
   }
 
   poke(aes_i.io.AES_mode, 2) // configure key
-  poke(aes_i.io.start, 1)
-  poke(aes_i.io.input_text(0), 5)
-  //poke(aes_i.io.input_text(0), 5)
-  //poke(aes_i.io.input_text(0), 5)
+  for (i <- 0 until Nrplus1) {
+    for (j <- 0 until Params.StateLength)
+      poke(aes_i.io.input_text(j), expandedKey(i)(j))
+    step(1)
+  }
   step(4)
 
   poke(aes_i.io.AES_mode, 0) // cipher
