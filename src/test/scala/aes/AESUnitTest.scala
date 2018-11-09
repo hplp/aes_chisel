@@ -74,26 +74,35 @@ class AESUnitTester(c: AES, Nk: Int) extends PeekPokeTester(c) {
     case 8 => expandedKey256
   }
 
-  poke(aes_i.io.AES_mode, 0) // cipher
-  poke(aes_i.io.start, 0)
   step(4) // test that things are fine in Idle state
+
+  // send expanded key to AES memory block
+  poke(aes_i.io.AES_mode, 1) // configure key
+  for (i <- 0 until Nrplus1) {
+    for (j <- 0 until Params.StateLength) {
+      poke(aes_i.io.input_text(j), expandedKey(i)(j))
+    }
+    step(1)
+  }
+  poke(aes_i.io.AES_mode, 0) // must stop when all roundKeys were sent
+  step(4)
+
+  poke(aes_i.io.AES_mode, 2) // cipher
+  step(1)
+  poke(aes_i.io.start, 1) // send start
+  step(1)
 
   // send the plaintext
   for (i <- 0 until Params.StateLength) {
     poke(aes_i.io.input_text(i), input_text(i))
   }
-  // send the expanded key
-  for (i <- 0 until Nrplus1) {
-    for (j <- 0 until Params.StateLength)
-      poke(aes_i.io.expandedKey(i)(j), expandedKey(i)(j))
-  }
-  // send start
-  poke(aes_i.io.start, 1)
+  poke(aes_i.io.start, 0) // reset start
   step(1)
 
-  // reset start
-  poke(aes_i.io.start, 0)
-  step(Nrplus1)
+  // remaining rounds
+  for (i <- 1 until Nrplus1) {
+    step(1)
+  }
 
   val state_e128 = Array(0x89, 0xed, 0x5e, 0x6a, 0x05, 0xca, 0x76, 0x33, 0x81, 0x35, 0x08, 0x5f, 0xe2, 0x1c, 0x40, 0xbd)
   val state_e192 = Array(0xbc, 0x3a, 0xaa, 0xb5, 0xd9, 0x7b, 0xaa, 0x7b, 0x32, 0x5d, 0x7b, 0x8f, 0x69, 0xcd, 0x7c, 0xa8)
@@ -110,25 +119,26 @@ class AESUnitTester(c: AES, Nk: Int) extends PeekPokeTester(c) {
     expect(aes_i.io.output_text(i), state_e(i))
   expect(aes_i.io.output_valid, 1)
 
-  poke(aes_i.io.AES_mode, 1) // inverse cipher
-  poke(aes_i.io.start, 1)
+  poke(aes_i.io.AES_mode, 0) // off
+  step(4)
+
+  poke(aes_i.io.AES_mode, 3) // inverse cipher
+  step(3)
+  poke(aes_i.io.start, 1) // send start
+  step(1)
 
   // send the ciphertext
   for (i <- 0 until Params.StateLength) {
     poke(aes_i.io.input_text(i), state_e(i))
   }
-  // send the expanded key
-  for (i <- 0 until Nrplus1) {
-    for (j <- 0 until Params.StateLength)
-      poke(aes_i.io.expandedKey(i)(j), expandedKey(i)(j))
-  }
-  // send start
-  poke(aes_i.io.start, 1)
-  step(1)
-
   // reset start
   poke(aes_i.io.start, 0)
-  step(Nrplus1)
+  step(1)
+
+  // remaining rounds
+  for (i <- 1 until Nrplus1) {
+    step(1)
+  }
 
   // verify aes cipher output
   for (i <- 0 until Params.StateLength)
