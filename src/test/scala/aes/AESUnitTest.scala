@@ -74,37 +74,33 @@ class AESUnitTester(c: AES, Nk: Int) extends PeekPokeTester(c) {
     case 8 => expandedKey256
   }
 
-  poke(aes_i.io.AES_mode, 2) // configure key
-  for (i <- 0 until Nrplus1) {
-    for (j <- 0 until Params.StateLength)
-      poke(aes_i.io.input_text(j), expandedKey(i)(j))
-    step(1)
-  }
-  step(4)
-
-  poke(aes_i.io.AES_mode, 0) // cipher
-  poke(aes_i.io.start, 0)
   step(4) // test that things are fine in Idle state
 
-  // send start
-  poke(aes_i.io.start, 1)
+  // send expanded key to AES memory block
+  poke(aes_i.io.AES_mode, 1) // configure key
+  for (i <- 0 until Nrplus1) {
+    for (j <- 0 until Params.StateLength) {
+      poke(aes_i.io.input_text(j), expandedKey(i)(j))
+    }
+    step(1)
+  }
+  poke(aes_i.io.AES_mode, 0) // must stop when all roundKeys were sent
+  step(4)
+
+  poke(aes_i.io.AES_mode, 2) // cipher
+  step(1)
+  poke(aes_i.io.start, 1) // send start
   step(1)
 
   // send the plaintext
   for (i <- 0 until Params.StateLength) {
     poke(aes_i.io.input_text(i), input_text(i))
   }
-  // send the expanded key for round 1
-  for (j <- 0 until Params.StateLength)
-    poke(aes_i.io.roundKey(j), expandedKey(0)(j))
-  // reset start
-  poke(aes_i.io.start, 0)
+  poke(aes_i.io.start, 0) // reset start
   step(1)
 
   // remaining rounds
   for (i <- 1 until Nrplus1) {
-    for (j <- 0 until Params.StateLength)
-      poke(aes_i.io.roundKey(j), expandedKey(i)(j))
     step(1)
   }
 
@@ -123,27 +119,24 @@ class AESUnitTester(c: AES, Nk: Int) extends PeekPokeTester(c) {
     expect(aes_i.io.output_text(i), state_e(i))
   expect(aes_i.io.output_valid, 1)
 
-  poke(aes_i.io.AES_mode, 1) // inverse cipher
+  poke(aes_i.io.AES_mode, 0) // off
+  step(4)
 
-  // send start
-  poke(aes_i.io.start, 1)
+  poke(aes_i.io.AES_mode, 3) // inverse cipher
+  step(3)
+  poke(aes_i.io.start, 1) // send start
   step(1)
 
   // send the ciphertext
   for (i <- 0 until Params.StateLength) {
     poke(aes_i.io.input_text(i), state_e(i))
   }
-  // send the expanded key for round 1
-  for (j <- 0 until Params.StateLength)
-    poke(aes_i.io.roundKey(j), expandedKey(Nr)(j))
   // reset start
   poke(aes_i.io.start, 0)
   step(1)
 
   // remaining rounds
   for (i <- 1 until Nrplus1) {
-    for (j <- 0 until Params.StateLength)
-      poke(aes_i.io.roundKey(j), expandedKey(Nr - i)(j))
     step(1)
   }
 
