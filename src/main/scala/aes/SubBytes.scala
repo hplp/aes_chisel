@@ -1,6 +1,7 @@
 package aes
 
 import chisel3._
+import lfsr.LFSR
 
 // implements SubBytes
 class SubBytes extends Module {
@@ -30,6 +31,12 @@ class SubBytes extends Module {
   for (i <- 0 until Params.StateLength) {
     io.state_out(i) := s_box(io.state_in(i))
   }
+
+  val LFSRModule = LFSR()
+  val lfsr6 = RegInit(0.U(6.W))
+  lfsr6 := LFSRModule.io.lfsr_6
+  val lfsr3r = RegInit(0.U(3.W))
+  lfsr3r := LFSRModule.io.lfsr_3r
 }
 
 object SubBytes {
