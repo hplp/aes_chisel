@@ -7,12 +7,12 @@
 * Compare code size with Verilog, Python, C++ and Vivado HLS as a index of development productivity
 
 ## Features
-* (more to come)
+* _(more to come)_
 * Compact AES Cipher and Inverse Cipher Chisel implementation
 * IDE (IntelliJ) compatible
 
 ## Instructions
-* run `./aes_tests.sh > logfile.txt` to run all tests and store console output into logfile
+* Run `./aes_tests.sh > logfile.txt` to run all tests and store console output into logfile
 * Generated Verilog will be in directory _/test_run_dir_
 * Either [gtkwave](http://gtkwave.sourceforge.net/) or [dinotrace](https://www.veripool.org/wiki/dinotrace) (or other wave viewer) can be used to display _.vcd_ files
 
