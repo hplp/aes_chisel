@@ -3,7 +3,7 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class CipherUnitTester(c: Cipher, Nk: Int) extends PeekPokeTester(c) {
+class CipherUnitTester(c: Cipher, Nk: Int, SubBytes_SCD: Boolean) extends PeekPokeTester(c) {
   require(Nk == 4 || Nk == 6 || Nk == 8)
 
   private val aes_cipher = c
@@ -122,24 +122,25 @@ class CipherUnitTester(c: Cipher, Nk: Int) extends PeekPokeTester(c) {
 
 class CipherTester extends ChiselFlatSpec {
   val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
+  val SubBytes_SCD = true
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
     "Cipher" should s"execute AES Cipher (with $backendName)" in {
-      Driver(() => new Cipher(Nk), backendName) {
-        c => new CipherUnitTester(c, Nk)
+      Driver(() => new Cipher(Nk, SubBytes_SCD), backendName) {
+        c => new CipherUnitTester(c, Nk, SubBytes_SCD)
       } should be(true)
     }
   }
 
   "running with --is-verbose" should "show more about what's going on in the tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new Cipher(Nk)) {
-      c => new CipherUnitTester(c, Nk)
+    iotesters.Driver.execute(Array("--is-verbose"), () => new Cipher(Nk, SubBytes_SCD)) {
+      c => new CipherUnitTester(c, Nk, SubBytes_SCD)
     } should be(true)
   }
 
   "running with --fint-write-vcd" should "create a vcd file from the test" in {
-    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new Cipher(Nk)) {
-      c => new CipherUnitTester(c, Nk)
+    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new Cipher(Nk, SubBytes_SCD)) {
+      c => new CipherUnitTester(c, Nk, SubBytes_SCD)
     } should be(true)
   }
 }

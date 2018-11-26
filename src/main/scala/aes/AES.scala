@@ -6,7 +6,7 @@ import chisel3.util.Cat
 
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
-class AES(Nk: Int) extends Module {
+class AES(Nk: Int, SubBytes_SCD: Boolean) extends Module {
   require(Nk == 4 || Nk == 6 || Nk == 8)
   val KeyLength: Int = Nk * Params.rows
   val Nr: Int = Nk + 6 // 10, 12, 14 rounds
@@ -24,7 +24,7 @@ class AES(Nk: Int) extends Module {
   })
 
   // Instantiate module objects
-  val CipherModule = Cipher(Nk)
+  val CipherModule = Cipher(Nk, SubBytes_SCD)
   val InvCipherModule = InvCipher(Nk)
 
   // Create a synchronous-read, synchronous-write memory block big enough for any key length
@@ -76,5 +76,5 @@ class AES(Nk: Int) extends Module {
 }
 
 object AES {
-  def apply(Nk: Int): AES = Module(new AES(Nk))
+  def apply(Nk: Int, SubBytes_SCD: Boolean): AES = Module(new AES(Nk, SubBytes_SCD))
 }

@@ -5,7 +5,7 @@ import chisel3.util._
 
 // implements AES_Encrypt
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
-class Cipher(Nk: Int) extends Module {
+class Cipher(Nk: Int, SubBytes_SCD: Boolean) extends Module {
   require(Nk == 4 || Nk == 6 || Nk == 8)
   val KeyLength: Int = Nk * Params.rows
   val Nr: Int = Nk + 6 // 10, 12, 14 rounds
@@ -21,7 +21,7 @@ class Cipher(Nk: Int) extends Module {
 
   // Instantiate module objects
   val AddRoundKeyModule = AddRoundKey()
-  val SubBytesModule = SubBytes()
+  val SubBytesModule = SubBytes(SubBytes_SCD)
   val ShiftRowsModule = ShiftRows()
   val MixColumnsModule = MixColumns()
 
@@ -82,5 +82,5 @@ class Cipher(Nk: Int) extends Module {
 }
 
 object Cipher {
-  def apply(Nk: Int): Cipher = Module(new Cipher(Nk))
+  def apply(Nk: Int, SubBytes_SCD: Boolean): Cipher = Module(new Cipher(Nk, SubBytes_SCD))
 }

@@ -2,8 +2,9 @@ package aes
 
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
+import org.scalacheck.Prop.True
 
-class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
+class SubBytesUnitTester(c: SubBytes, SCD: Boolean) extends PeekPokeTester(c) {
 
   def computeSubBytes(state_in: Array[Int]): Array[Int] = {
     var s_box = Array(
@@ -45,7 +46,7 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
   for (i <- 0 until Params.StateLength)
     expect(aes_sb.io.state_out(i), state(i))
 
-  step(100)
+  step(20)
 }
 
 // Run test with:
@@ -53,24 +54,25 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
 // extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class SubBytesTester extends ChiselFlatSpec {
+  val SCD = true
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {
     "SubBytes" should s"execute AES SubBytes (with $backendName)" in {
-      Driver(() => new SubBytes, backendName) {
-        c => new SubBytesUnitTester(c)
+      Driver(() => new SubBytes(SCD), backendName) {
+        c => new SubBytesUnitTester(c, SCD)
       } should be(true)
     }
   }
 
   "running with --is-verbose" should "show more about what's going on in the tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new SubBytes) {
-      c => new SubBytesUnitTester(c)
+    iotesters.Driver.execute(Array("--is-verbose"), () => new SubBytes(SCD)) {
+      c => new SubBytesUnitTester(c, SCD)
     } should be(true)
   }
 
   "running with --fint-write-vcd" should "create a vcd file from the test" in {
-    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new SubBytes) {
-      c => new SubBytesUnitTester(c)
+    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new SubBytes(SCD)) {
+      c => new SubBytesUnitTester(c, SCD)
     } should be(true)
   }
 }
