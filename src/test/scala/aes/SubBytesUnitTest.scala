@@ -44,6 +44,8 @@ class SubBytesUnitTester(c: SubBytes) extends PeekPokeTester(c) {
 
   for (i <- 0 until Params.StateLength)
     expect(aes_sb.io.state_out(i), state(i))
+
+  step(100)
 }
 
 // Run test with:

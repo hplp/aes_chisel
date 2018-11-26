@@ -1,10 +1,11 @@
 package aes
 
 import chisel3._
+import chisel3.util._
 import lfsr.LFSR
 
 // implements SubBytes
-class SubBytes extends Module {
+class SubBytes(SCD: Boolean) extends Module {
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
@@ -32,13 +33,19 @@ class SubBytes extends Module {
     io.state_out(i) := s_box(io.state_in(i))
   }
 
-  val LFSRModule = LFSR()
-  val lfsr6 = RegInit(0.U(6.W))
-  lfsr6 := LFSRModule.io.lfsr_6
-  val lfsr3r = RegInit(0.U(3.W))
-  lfsr3r := LFSRModule.io.lfsr_3r
+  if (SCD) {
+    // dummy noise module with LFSR
+    val LFSRModule = LFSR()
+    val lfsr6 = RegInit(0.U(6.W)) // 6 LFSR bits
+    lfsr6 := LFSRModule.io.lfsr_6
+    val lfsr3r = RegInit(0.U(3.W)) // 3 LFSR bits extracted
+    lfsr3r := LFSRModule.io.lfsr_3r
+    val s_box_lfsr = RegInit(0.U(8.W))
+    s_box_lfsr := s_box(Cat(lfsr6(4, 0), lfsr3r)) // 5 + 3 bits
+    printf("%b %b %b %b %b \n", lfsr6, lfsr6(4, 0), lfsr3r, Cat(lfsr6(4, 0), lfsr3r), s_box_lfsr)
+  }
 }
 
 object SubBytes {
-  def apply(): SubBytes = Module(new SubBytes())
+  def apply(SCD: Boolean): SubBytes = Module(new SubBytes(SCD))
 }
