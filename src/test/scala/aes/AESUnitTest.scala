@@ -154,8 +154,8 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
 // sbt 'testOnly aes.AESTester -- -z vcd'
 
 class AESTester extends ChiselFlatSpec {
-  val SubBytes_SCD = true
-  val InvSubBytes_SCD = true
+  val SubBytes_SCD = false
+  val InvSubBytes_SCD = false
   val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
   private val backendNames = Array[String]("firrtl", "verilator")
   for (backendName <- backendNames) {

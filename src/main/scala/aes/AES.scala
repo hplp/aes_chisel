@@ -48,7 +48,7 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
       address := 0.U
     }
   dataOut := expandedKeyMem(address)
-  printf("expandedKeyMem address %x dataOut %x\n", address, dataOut)
+  //printf("expandedKeyMem address %x dataOut %x\n", address, dataOut)
 
   val initValues = Seq.fill(Params.StateLength) {
     0.U(8.W)
@@ -72,7 +72,6 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
   io.output_valid := CipherModule.io.state_out_valid || InvCipherModule.io.state_out_valid
   // AES output can be managed using a Mux on the Cipher output and the InvCipher output
   io.output_text <> Mux(CipherModule.io.state_out_valid, CipherModule.io.state_out, InvCipherModule.io.state_out)
-  printf("address=%d\n", address)
 }
 
 object AES {

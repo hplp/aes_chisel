@@ -41,7 +41,7 @@ class InvSubBytes(SCD: Boolean) extends Module {
     lfsr3r := LFSRModule.io.lfsr_3r
     val inverted_s_box_lfsr = RegInit(0.U(8.W))
     inverted_s_box_lfsr := inverted_s_box(Cat(lfsr6(4, 0), lfsr3r)) // 5 + 3 bits
-    printf("LFSR ISB %b %b %b %b %b \n", lfsr6, lfsr6(4, 0), lfsr3r, Cat(lfsr6(4, 0), lfsr3r), inverted_s_box_lfsr)
+    //printf("LFSR ISB %b %b %b %b %b \n", lfsr6, lfsr6(4, 0), lfsr3r, Cat(lfsr6(4, 0), lfsr3r), inverted_s_box_lfsr)
   }
 }
 

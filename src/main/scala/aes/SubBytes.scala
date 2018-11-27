@@ -42,7 +42,7 @@ class SubBytes(SCD: Boolean) extends Module {
     lfsr3r := LFSRModule.io.lfsr_3r
     val s_box_lfsr = RegInit(0.U(8.W))
     s_box_lfsr := s_box(Cat(lfsr6(4, 0), lfsr3r)) // 5 + 3 bits
-    printf("LFSR  SB %b %b %b %b %b \n", lfsr6, lfsr6(4, 0), lfsr3r, Cat(lfsr6(4, 0), lfsr3r), s_box_lfsr)
+    //printf("LFSR  SB %b %b %b %b %b \n", lfsr6, lfsr6(4, 0), lfsr3r, Cat(lfsr6(4, 0), lfsr3r), s_box_lfsr)
   }
 }
 
