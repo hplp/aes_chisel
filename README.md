@@ -18,5 +18,6 @@
 
 ## References
 * This project was created using the [chisel-template](https://github.com/freechipsproject/chisel-template) from [freechipsproject](https://github.com/freechipsproject)
+* Yet another AES implementation in Chisel: [github.com/yaozhaosh/chisel-aes](https://github.com/yaozhaosh/chisel-aes)
 * Best resource for learning Chisel: [chisel-bootcamp](https://github.com/freechipsproject/chisel-bootcamp)
 * Useful and highly recommeded [Scala class on coursera](https://www.coursera.org/learn/progfun1)
