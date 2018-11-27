@@ -2,7 +2,6 @@ package aes
 
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
-import org.scalacheck.Prop.True
 
 class SubBytesUnitTester(c: SubBytes, SCD: Boolean) extends PeekPokeTester(c) {
 
