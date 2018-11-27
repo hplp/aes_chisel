@@ -5,7 +5,7 @@ import chisel3.util._
 
 // implements AES_Decrypt
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
-class InvCipher(Nk: Int) extends Module {
+class InvCipher(Nk: Int, InvSubBytes_SCD: Boolean) extends Module {
   require(Nk == 4 || Nk == 6 || Nk == 8)
   val KeyLength: Int = Nk * Params.rows
   val Nr: Int = Nk + 6 // 10, 12, 14 rounds
@@ -21,7 +21,7 @@ class InvCipher(Nk: Int) extends Module {
 
   // Instantiate module objects
   val AddRoundKeyModule = AddRoundKey()
-  val InvSubBytesModule = InvSubBytes()
+  val InvSubBytesModule = InvSubBytes(InvSubBytes_SCD)
   val InvShiftRowsModule = InvShiftRows()
   val InvMixColumnsModule = InvMixColumns()
 
@@ -81,5 +81,5 @@ class InvCipher(Nk: Int) extends Module {
 }
 
 object InvCipher {
-  def apply(Nk: Int): InvCipher = Module(new InvCipher(Nk))
+  def apply(Nk: Int, InvSubBytes_SCD: Boolean): InvCipher = Module(new InvCipher(Nk, InvSubBytes_SCD))
 }
