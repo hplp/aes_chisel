@@ -2,13 +2,15 @@
 
 
 ## Motivation
-* Equip developers with ready-to-use, efficient, parameterizable, encryption macros
+* Implement an open-source, transparent, secure encryption module in Chisel
+* Equip developers with ready-to-use, efficient, parameterizable, encryption macros for RISC-V systems
 * Compare performance and resource utilization of generated HDL with pure Verilog and Vivado HLS
 * Compare code size with Verilog, Python, C++ and Vivado HLS as a index of development productivity
 
 ## Features
 * _(more to come)_
 * Compact AES Cipher and Inverse Cipher Chisel implementation
+* Basic side-channel attack defense based on LFSR noise
 * IDE (IntelliJ) compatible
 
 ## Instructions
