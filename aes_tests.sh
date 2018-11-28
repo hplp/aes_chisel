@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # script to run all tests at once
 
 echo -e "SubBytesTester:\n"

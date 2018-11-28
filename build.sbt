@@ -45,10 +45,11 @@ resolvers ++= Seq(
 val defaultVersions = Map(
   "chisel3" -> "3.1.+",
   "chisel-iotesters" -> "1.2.+"
-  )
+)
 
-libraryDependencies ++= (Seq("chisel3","chisel-iotesters").map {
-  dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep)) })
+libraryDependencies ++= Seq("chisel3", "chisel-iotesters").map {
+  dep: String => "edu.berkeley.cs" %% dep % sys.props.getOrElse(dep + "Version", defaultVersions(dep))
+}
 
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 

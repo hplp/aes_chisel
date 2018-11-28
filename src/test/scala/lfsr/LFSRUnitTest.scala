@@ -1,7 +1,7 @@
 package lfsr
 
 import chisel3.iotesters
-import chisel3.iotesters.{ ChiselFlatSpec, Driver, PeekPokeTester }
+import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 class LFSRUnitTester(c: LFSR) extends PeekPokeTester(c) {
   //init D0123456 to 1
@@ -17,25 +17,57 @@ class LFSRUnitTester(c: LFSR) extends PeekPokeTester(c) {
   }
 }
 
+// Run with:
+//    sbt 'testOnly lfsr.LFSRTester'
+// or sbt 'testOnly lfsr.LFSRTester -- -z verbose'
+// or sbt 'testOnly lfsr.LFSRTester -- -z vcd'
+
 class LFSRTester extends ChiselFlatSpec {
+
   private val backendNames = Array[String]("firrtl", "verilator")
+  private val dir = "LFSR"
+
   for (backendName <- backendNames) {
-    "LFSR" should s"generate random numbers (with ${backendName})" in {
+    "LFSR" should s"calculate proper greatest common denominator (with $backendName)" in {
       Driver(() => new LFSR, backendName) {
         c => new LFSRUnitTester(c)
       } should be(true)
     }
   }
 
-  "running with --is-verbose" should "show more about what's going on in the tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new LFSR) {
+  "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new LFSR) {
       c => new LFSRUnitTester(c)
     } should be(true)
   }
 
-  "running with --fint-write-vcd" should "create a vcd file from the test" in {
-    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new LFSR) {
+  "using --backend-name verilator" should "be an alternative way to run using verilator" in {
+    if (backendNames.contains("verilator")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
+        "--backend-name", "verilator"), () => new LFSR) {
+        c => new LFSRUnitTester(c)
+      } should be(true)
+    }
+  }
+
+  "using --backend-name firrtl" should "be an alternative way to run using firrtl" in {
+    if (backendNames.contains("firrtl")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
+        "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new LFSR) {
+        c => new LFSRUnitTester(c)
+      } should be(true)
+    }
+  }
+
+  "running with --is-verbose" should "show more about what's going on in your tester" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
+      "--is-verbose"), () => new LFSR) {
       c => new LFSRUnitTester(c)
     } should be(true)
   }
+
 }
