@@ -76,7 +76,7 @@ class Cipher(Nk: Int, SubBytes_SCD: Boolean) extends Module {
   io.state_out := state
 
   // Debug statements
-  printf("E_STM: %d, rounds: %d, valid: %d\n", STM, rounds, io.state_out_valid)
+  //printf("E_STM: %d, rounds: %d, valid: %d\n", STM, rounds, io.state_out_valid)
   //printf("E_roundKey: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x\n", io.roundKey(0), io.roundKey(1), io.roundKey(2), io.roundKey(3), io.roundKey(4), io.roundKey(5), io.roundKey(6), io.roundKey(7), io.roundKey(8), io.roundKey(9), io.roundKey(10), io.roundKey(11), io.roundKey(12), io.roundKey(13), io.roundKey(14), io.roundKey(15))
   //printf("state: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", state(0), state(1), state(2), state(3), state(4), state(5), state(6), state(7), state(8), state(9), state(10), state(11), state(12), state(13), state(14), state(15))
 }

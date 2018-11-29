@@ -74,20 +74,26 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
     case 8 => expandedKey256
   }
 
+  printf("\nStarting the tests with 4 idle cycles\n")
+  poke(aes_i.io.AES_mode, 0) // off
+  poke(aes_i.io.start, 0) // off
   step(4) // test that things are fine in Idle state
 
+  printf("\nSending expanded AES key\n")
   // send expanded key to AES memory block
   poke(aes_i.io.AES_mode, 1) // configure key
-  poke(aes_i.io.start, 0) // configure key
   for (i <- 0 until Nrplus1) {
     for (j <- 0 until Params.StateLength) {
       poke(aes_i.io.input_text(j), expandedKey(i)(j))
     }
     step(1)
   }
+
+  printf("\nStaying idle for 4 cycles\n")
   poke(aes_i.io.AES_mode, 0) // must stop when all roundKeys were sent
   step(4)
 
+  printf("\nStarting AES cipher mode, sending plaintext\n")
   poke(aes_i.io.AES_mode, 2) // cipher
   step(1)
   poke(aes_i.io.start, 1) // send start
@@ -115,6 +121,7 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
     case 8 => state_e256
   }
 
+  printf("\nInspecting cipher output\n")
   // verify aes cipher output
   for (i <- 0 until Params.StateLength)
     expect(aes_i.io.output_text(i), state_e(i))
@@ -123,9 +130,11 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
   // store cipher output
   val cipher_output = peek(aes_i.io.output_text)
 
+  printf("\nStaying idle for 4 cycles\n")
   poke(aes_i.io.AES_mode, 0) // off
   step(4)
 
+  printf("\nStarting AES inverse cipher mode, sending ciphertext\n")
   poke(aes_i.io.AES_mode, 3) // inverse cipher
   step(3)
   poke(aes_i.io.start, 1) // send start
@@ -144,11 +153,13 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
     step(1)
   }
 
+  printf("\nInspecting inverse cipher output\n")
   // verify aes cipher output
   for (i <- 0 until Params.StateLength)
     expect(aes_i.io.output_text(i), input_text(i))
   expect(aes_i.io.output_valid, 1)
 
+  printf("\nStaying idle for 4 cycles\n")
   step(4)
 }
 

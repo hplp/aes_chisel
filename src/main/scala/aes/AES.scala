@@ -72,6 +72,9 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
   io.output_valid := CipherModule.io.state_out_valid || InvCipherModule.io.state_out_valid
   // AES output can be managed using a Mux on the Cipher output and the InvCipher output
   io.output_text <> Mux(CipherModule.io.state_out_valid, CipherModule.io.state_out, InvCipherModule.io.state_out)
+
+  // Debug statements
+  //printf("AES mode=%b start=%b, mem_address=%d, mem_dataOut=%x, \n", io.AES_mode, io.start, address, dataOut)
 }
 
 object AES {
