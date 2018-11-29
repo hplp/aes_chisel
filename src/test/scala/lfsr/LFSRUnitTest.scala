@@ -46,7 +46,7 @@ class LFSRTester extends ChiselFlatSpec {
     if (backendNames.contains("verilator")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
-        "--backend-name", "verilator"), () => new LFSR) {
+          "--backend-name", "verilator"), () => new LFSR) {
         c => new LFSRUnitTester(c)
       } should be(true)
     }
@@ -56,7 +56,7 @@ class LFSRTester extends ChiselFlatSpec {
     if (backendNames.contains("firrtl")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
-        "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new LFSR) {
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new LFSR) {
         c => new LFSRUnitTester(c)
       } should be(true)
     }
@@ -65,7 +65,7 @@ class LFSRTester extends ChiselFlatSpec {
   "running with --is-verbose" should "show more about what's going on in your tester" in {
     iotesters.Driver.execute(
       Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
-      "--is-verbose"), () => new LFSR) {
+        "--is-verbose"), () => new LFSR) {
       c => new LFSRUnitTester(c)
     } should be(true)
   }

@@ -38,7 +38,10 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
 // extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class AddRoundKeyTester extends ChiselFlatSpec {
-  private val backendNames = Array[String]("firrtl", "verilator")
+
+  private val backendNames = Array("firrtl", "verilator")
+  private val dir = "AddRoundKey"
+
   for (backendName <- backendNames) {
     "AddRoundKey" should s"execute AES AddRoundKey (with $backendName)" in {
       Driver(() => new AddRoundKey, backendName) {
@@ -47,15 +50,39 @@ class AddRoundKeyTester extends ChiselFlatSpec {
     }
   }
 
-  "running with --is-verbose" should "show more about what's going on in the tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new AddRoundKey) {
+  "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new AddRoundKey) {
       c => new AddRoundKeyUnitTester(c)
     } should be(true)
   }
 
-  "running with --fint-write-vcd" should "create a vcd file from the test" in {
-    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new AddRoundKey) {
+  "using --backend-name verilator" should "be an alternative way to run using verilator" in {
+    if (backendNames.contains("verilator")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
+          "--backend-name", "verilator"), () => new AddRoundKey) {
+        c => new AddRoundKeyUnitTester(c)
+      } should be(true)
+    }
+  }
+
+  "using --backend-name firrtl" should "be an alternative way to run using firrtl" in {
+    if (backendNames.contains("firrtl")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new AddRoundKey) {
+        c => new AddRoundKeyUnitTester(c)
+      } should be(true)
+    }
+  }
+
+  "running with --is-verbose" should "show more about what's going on in your tester" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
+        "--is-verbose"), () => new AddRoundKey) {
       c => new AddRoundKeyUnitTester(c)
     } should be(true)
   }
+
 }

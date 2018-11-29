@@ -53,8 +53,11 @@ class InvSubBytesUnitTester(c: InvSubBytes, SCD: Boolean) extends PeekPokeTester
 // extend with the option '-- -z verbose' or '-- -z vcd' for specific test
 
 class InvSubBytesTester extends ChiselFlatSpec {
-  val SCD = true
-  private val backendNames = Array[String]("firrtl", "verilator")
+
+  private val SCD = true
+  private val backendNames = Array("firrtl", "verilator")
+  private val dir = "InvSubBytes"
+
   for (backendName <- backendNames) {
     "InvSubBytes" should s"execute AES InvSubBytes (with $backendName)" in {
       Driver(() => new InvSubBytes(SCD), backendName) {
@@ -63,15 +66,39 @@ class InvSubBytesTester extends ChiselFlatSpec {
     }
   }
 
-  "running with --is-verbose" should "show more about what's going on in the tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new InvSubBytes(SCD)) {
+  "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new InvSubBytes(SCD)) {
       c => new InvSubBytesUnitTester(c, SCD)
     } should be(true)
   }
 
-  "running with --fint-write-vcd" should "create a vcd file from the test" in {
-    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new InvSubBytes(SCD)) {
+  "using --backend-name verilator" should "be an alternative way to run using verilator" in {
+    if (backendNames.contains("verilator")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
+          "--backend-name", "verilator"), () => new InvSubBytes(SCD)) {
+        c => new InvSubBytesUnitTester(c, SCD)
+      } should be(true)
+    }
+  }
+
+  "using --backend-name firrtl" should "be an alternative way to run using firrtl" in {
+    if (backendNames.contains("firrtl")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new InvSubBytes(SCD)) {
+        c => new InvSubBytesUnitTester(c, SCD)
+      } should be(true)
+    }
+  }
+
+  "running with --is-verbose" should "show more about what's going on in your tester" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
+        "--is-verbose"), () => new InvSubBytes(SCD)) {
       c => new InvSubBytesUnitTester(c, SCD)
     } should be(true)
   }
+
 }

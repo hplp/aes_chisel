@@ -108,7 +108,7 @@ class GCDTester extends ChiselFlatSpec {
   "running with --is-verbose" should "show more about what's going on in your tester" in {
     iotesters.Driver.execute(
       Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
-      "--is-verbose"), () => new GCD) {
+        "--is-verbose"), () => new GCD) {
       c => new GCDUnitTester(c)
     } should be(true)
   }

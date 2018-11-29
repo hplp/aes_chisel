@@ -154,10 +154,13 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
 // sbt 'testOnly aes.AESTester -- -z vcd'
 
 class AESTester extends ChiselFlatSpec {
-  val SubBytes_SCD = false
-  val InvSubBytes_SCD = false
+
+  private val SubBytes_SCD = false
+  private val InvSubBytes_SCD = false
   val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
-  private val backendNames = Array[String]("firrtl", "verilator")
+  private val backendNames = Array("firrtl", "verilator")
+  private val dir = "AES"
+
   for (backendName <- backendNames) {
     "AES" should s"execute cipher and inverse cipher (with $backendName)" in {
       Driver(() => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD), backendName) {
@@ -166,15 +169,40 @@ class AESTester extends ChiselFlatSpec {
     }
   }
 
-  "running with --is-verbose" should "show more about what's going on in the tester" in {
-    iotesters.Driver.execute(Array("--is-verbose"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD)) {
+  "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir),
+      () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD)) {
       c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD)
     } should be(true)
   }
 
-  "running with --fint-write-vcd" should "create a vcd file from the test" in {
-    iotesters.Driver.execute(Array("--fint-write-vcd"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD)) {
+  "using --backend-name verilator" should "be an alternative way to run using verilator" in {
+    if (backendNames.contains("verilator")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
+          "--backend-name", "verilator"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD)) {
+        c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD)
+      } should be(true)
+    }
+  }
+
+  "using --backend-name firrtl" should "be an alternative way to run using firrtl" in {
+    if (backendNames.contains("firrtl")) {
+      iotesters.Driver.execute(
+        Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD)) {
+        c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD)
+      } should be(true)
+    }
+  }
+
+  "running with --is-verbose" should "show more about what's going on in your tester" in {
+    iotesters.Driver.execute(
+      Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
+        "--is-verbose"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD)) {
       c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD)
     } should be(true)
   }
+
 }
