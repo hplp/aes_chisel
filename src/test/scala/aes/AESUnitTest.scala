@@ -78,6 +78,7 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
 
   // send expanded key to AES memory block
   poke(aes_i.io.AES_mode, 1) // configure key
+  poke(aes_i.io.start, 0) // configure key
   for (i <- 0 until Nrplus1) {
     for (j <- 0 until Params.StateLength) {
       poke(aes_i.io.input_text(j), expandedKey(i)(j))
@@ -119,6 +120,9 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
     expect(aes_i.io.output_text(i), state_e(i))
   expect(aes_i.io.output_valid, 1)
 
+  // store cipher output
+  val cipher_output = peek(aes_i.io.output_text)
+
   poke(aes_i.io.AES_mode, 0) // off
   step(4)
 
@@ -129,7 +133,7 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
 
   // send the ciphertext
   for (i <- 0 until Params.StateLength) {
-    poke(aes_i.io.input_text(i), state_e(i))
+    poke(aes_i.io.input_text(i), cipher_output(i)) // same as state_e(i)
   }
   // reset start
   poke(aes_i.io.start, 0)
@@ -150,6 +154,8 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
 
 // Run test with:
 // sbt 'testOnly aes.AESTester'
+// sbt 'testOnly aes.AESTester -- -z "using verilator"'
+// sbt 'testOnly aes.AESTester -- -z "using firrtl"'
 // sbt 'testOnly aes.AESTester -- -z verbose'
 // sbt 'testOnly aes.AESTester -- -z vcd'
 
