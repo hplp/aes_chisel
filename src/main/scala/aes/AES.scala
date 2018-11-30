@@ -3,6 +3,7 @@ package aes
 import chisel3._
 import chisel3.util.log2Ceil
 import chisel3.util.Cat
+import chisel3.util.MuxCase
 
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
@@ -71,7 +72,7 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
   // AES output_valid can be the Cipher.output_valid OR InvCipher.output_valid
   io.output_valid := CipherModule.io.state_out_valid || InvCipherModule.io.state_out_valid
   // AES output can be managed using a Mux on the Cipher output and the InvCipher output
-  io.output_text <> Mux(CipherModule.io.state_out_valid, CipherModule.io.state_out, InvCipherModule.io.state_out)
+  io.output_text <> Mux(CipherModule.io.state_out_valid, CipherModule.io.state_out, Mux(InvCipherModule.io.state_out_valid, InvCipherModule.io.state_out, RegInit(VecInit(initValues))))
 
   // Debug statements
   //printf("AES mode=%b start=%b, mem_address=%d, mem_dataOut=%x, \n", io.AES_mode, io.start, address, dataOut)
