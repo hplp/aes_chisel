@@ -73,7 +73,7 @@ class Cipher(Nk: Int, SubBytes_SCD: Boolean) extends Module {
 
   // Set state_out_valid true when cipher ends
   io.state_out_valid := rounds === Nrplus1.U
-  io.state_out := state
+  io.state_out := Mux(rounds === Nrplus1.U, state, RegInit(VecInit(initValues)))
 
   // Debug statements
   //printf("E_STM: %d, rounds: %d, valid: %d\n", STM, rounds, io.state_out_valid)
