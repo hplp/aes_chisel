@@ -40,11 +40,17 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
   }
     .otherwise {
       dataOut := expandedKeyMem(address)
+
       when(io.AES_mode === 2.U) {
         address := address + 1.U
       }
         .elsewhen(io.AES_mode === 3.U) {
-          address := address - 1.U
+          when(address === 0.U) {
+            address := Nr.U
+          }
+            .otherwise {
+              address := address - 1.U
+            }
         }
         .otherwise {
           address := 0.U

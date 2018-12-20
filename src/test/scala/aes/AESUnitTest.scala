@@ -136,7 +136,7 @@ class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boo
 
   printf("\nStarting AES inverse cipher mode, sending ciphertext\n")
   poke(aes_i.io.AES_mode, 3) // inverse cipher
-  step(3)
+  step(2) // additional clk cycle for address to go from 0 to Nr and dataOut to read
   poke(aes_i.io.start, 1) // send start
   step(1)
 
