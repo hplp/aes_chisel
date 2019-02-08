@@ -19,6 +19,7 @@
 * Either [gtkwave](http://gtkwave.sourceforge.net/) or [dinotrace](https://www.veripool.org/wiki/dinotrace) (or other wave viewer) can be used to display _.vcd_ files
 
 ## References
+* Our implementations of AES in Python, C/C++, Vivado HLS: [github.com/hplp/AES_implementations](https://github.com/hplp/AES_implementations)
 * This project was created using the [chisel-template](https://github.com/freechipsproject/chisel-template) from [freechipsproject](https://github.com/freechipsproject)
 * Yet another AES implementation in Chisel: [github.com/yaozhaosh/chisel-aes](https://github.com/yaozhaosh/chisel-aes)
 * Best resource for learning Chisel: [chisel-bootcamp](https://github.com/freechipsproject/chisel-bootcamp)
