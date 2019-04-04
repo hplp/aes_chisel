@@ -30,7 +30,7 @@ def javacOptionsVersion(scalaVersion: String): Seq[String] = {
 
 name := "aes_chisel"
 
-version := "3.1.0"
+version := "3.2.0"
 
 scalaVersion := "2.11.12"
 
@@ -54,3 +54,27 @@ libraryDependencies ++= Seq("chisel3", "chisel-iotesters").map {
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
 
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
+
+// POM settings for Sonatype
+// Sonatype Username: smosanu (same as github username)
+// Full name: Sergiu Mosanu
+organization := "com.github.hplp"
+organizationName := "hplp"
+homepage := Some(url("http://hplp.ece.virginia.edu/home"))
+scmInfo := Some(ScmInfo(url("https://github.com/hplp/aes_chisel"), "git@github.com:hplp/aes_chisel.git"))
+developers := List(Developer("smosanu", "Sergiu Mosanu", "sm7ed@virginia.edu", url("https://github.com/smosanu")))
+licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0"))
+
+publishMavenStyle := true
+publishConfiguration := publishConfiguration.value.withOverwrite(true)
+publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true)
+
+// Add sonatype repository settings
+publishTo := Some(
+  if (isSnapshot.value)
+    Opts.resolver.sonatypeSnapshots
+  else
+    Opts.resolver.sonatypeStaging
+)
+
+pgpReadOnly := false
