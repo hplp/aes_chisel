@@ -1,5 +1,4 @@
-
-#How _(not)_ to deploy to Maven Central with sbt
+# How _(not)_ to deploy to Maven Central with sbt
 
 This AES implementation in Chisel is now available on [Maven Central](https://search.maven.org/search?q=g:com.github.hplp),
 so anyone can easily import it into their projects. You should deploy your awesome library too! Here's how deploying went for me.
