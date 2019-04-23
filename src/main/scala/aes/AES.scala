@@ -6,8 +6,10 @@ import chisel3.util.Cat
 
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
-class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Module {
+// change expandedKeyMemType= ROM, Mem, SyncReadMem
+class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String) extends Module {
   require(Nk == 4 || Nk == 6 || Nk == 8)
+  require(expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem" || expandedKeyMemType == "SyncReadMem")
   val KeyLength: Int = Nk * Params.rows
   val Nr: Int = Nk + 6 // 10, 12, 14 rounds
   val Nrplus1: Int = Nr + 1 // 10+1, 12+1, 14+1
@@ -27,20 +29,39 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
   val CipherModule = Cipher(Nk, SubBytes_SCD)
   val InvCipherModule = InvCipher(Nk, InvSubBytes_SCD)
 
-  // Create a synchronous-read, synchronous-write memory block big enough for any key length
+
   // A roundKey is Params.StateLength bytes, and 1+(10/12/14) (< EKDepth) of them are needed
-  val expandedKeyMem = SyncReadMem(EKDepth, UInt((Params.StateLength * 8).W))
+  // SyncReadMem = sequential/synchronous-read, sequential/synchronous-write = SRAMs
+  // Create a synchronous-read, synchronous-write memory block big enough for any key length
+  val expandedKeySRMem = SyncReadMem(EKDepth, UInt((Params.StateLength * 8).W))
+
+  // Mem = combinational/asynchronous-read, sequential/synchronous-write = register banks
+  // Create a asynchronous-read, synchronous-write memory block big enough for any key length
+  val expandedKeyARMem = Mem(EKDepth, UInt((Params.StateLength * 8).W))
+
+  // use the same address and dataOut val elements to interface with the parameterized memory
   val address = RegInit(0.U(log2Ceil(EKDepth).W))
   val dataOut = RegInit(0.U((Params.StateLength * 8).W))
 
-  when(io.AES_mode === 1.U) {
-    expandedKeyMem(address) := Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
+  when(io.AES_mode === 1.U) { // write to memory
+    if (expandedKeyMemType == "SyncReadMem") {
+      expandedKeySRMem(address) := Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
+    }
+    else if (expandedKeyMemType == "Mem") {
+      expandedKeyARMem(address) := Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
+    }
     dataOut := DontCare
     address := address + 1.U
   }
-    .otherwise {
-      dataOut := expandedKeyMem(address)
+    .otherwise { // read from memory
+      if (expandedKeyMemType == "SyncReadMem") {
+        dataOut := expandedKeySRMem(address)
+      }
+      else if (expandedKeyMemType == "Mem") {
+        dataOut := expandedKeyARMem(address)
+      }
 
+      // a bit of address logistics
       when(io.AES_mode === 2.U) {
         address := address + 1.U
       }
@@ -57,12 +78,14 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
         }
     }
 
-  // The input text can go to both the cipher and the inverse cipher (for now)
-  CipherModule.io.plaintext <> io.input_text
+  // The roundKey for each round goes to bothv cipher and inverse cipher (for now TODO)
   CipherModule.io.roundKey := Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
-
-  InvCipherModule.io.ciphertext <> io.input_text
   InvCipherModule.io.roundKey := Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
+  //}
+
+  // The input text can go to both the cipher and the inverse cipher (for now TODO)
+  CipherModule.io.plaintext <> io.input_text
+  InvCipherModule.io.ciphertext <> io.input_text
 
   // Cipher starts at (start=1 and AES_Mode=2)
   CipherModule.io.start := io.start && (io.AES_mode === 2.U)
@@ -79,5 +102,5 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean) extends Modu
 }
 
 object AES {
-  def apply(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean): AES = Module(new AES(Nk, SubBytes_SCD, InvSubBytes_SCD))
+  def apply(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String): AES = Module(new AES(Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType))
 }
