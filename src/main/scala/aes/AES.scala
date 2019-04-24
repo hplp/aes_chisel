@@ -29,39 +29,44 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyM
   val CipherModule = Cipher(Nk, SubBytes_SCD)
   val InvCipherModule = InvCipher(Nk, InvSubBytes_SCD)
 
+  // ROM = configuration that stores the expanded key in ROM
+  val initValues = Seq.fill(Params.StateLength) {
+    0.U(8.W)
+  }
+  val ROMeKeyOut = RegInit(VecInit(initValues))
 
   // A roundKey is Params.StateLength bytes, and 1+(10/12/14) (< EKDepth) of them are needed
-  // SyncReadMem = sequential/synchronous-read, sequential/synchronous-write = SRAMs
-  // Create a synchronous-read, synchronous-write memory block big enough for any key length
-  val expandedKeySRMem = SyncReadMem(EKDepth, UInt((Params.StateLength * 8).W))
-
   // Mem = combinational/asynchronous-read, sequential/synchronous-write = register banks
   // Create a asynchronous-read, synchronous-write memory block big enough for any key length
   val expandedKeyARMem = Mem(EKDepth, UInt((Params.StateLength * 8).W))
+
+  // SyncReadMem = sequential/synchronous-read, sequential/synchronous-write = SRAMs
+  // Create a synchronous-read, synchronous-write memory block big enough for any key length
+  val expandedKeySRMem = SyncReadMem(EKDepth, UInt((Params.StateLength * 8).W))
 
   // use the same address and dataOut val elements to interface with the parameterized memory
   val address = RegInit(0.U(log2Ceil(EKDepth).W))
   val dataOut = RegInit(0.U((Params.StateLength * 8).W))
 
   when(io.AES_mode === 1.U) { // write to memory
-    if (expandedKeyMemType == "SyncReadMem") {
-      expandedKeySRMem(address) := Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
-    }
-    else if (expandedKeyMemType == "Mem") {
+    if (expandedKeyMemType == "Mem") {
       expandedKeyARMem(address) := Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
+    }
+    else if (expandedKeyMemType == "SyncReadMem") {
+      expandedKeySRMem(address) := Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
     }
     dataOut := DontCare
     address := address + 1.U
   }
     .otherwise { // read from memory
-      if (expandedKeyMemType == "SyncReadMem") {
-        dataOut := expandedKeySRMem(address)
-      }
-      else if (expandedKeyMemType == "Mem") {
+      if (expandedKeyMemType == "Mem") {
         dataOut := expandedKeyARMem(address)
       }
+      else if (expandedKeyMemType == "SyncReadMem") {
+        dataOut := expandedKeySRMem(address)
+      }
 
-      // a bit of address logistics
+      // address logistics
       when(io.AES_mode === 2.U) {
         address := address + 1.U
       }
@@ -78,10 +83,26 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyM
         }
     }
 
-  // The roundKey for each round goes to bothv cipher and inverse cipher (for now TODO)
-  CipherModule.io.roundKey := Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
-  InvCipherModule.io.roundKey := Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
-  //}
+  if (expandedKeyMemType == "ROM") {
+    for (i <- 0 to Params.StateLength - 1) {
+      if (Nk == 4) {
+        ROMeKeyOut(i.U) := ROMeKeys.expandedKey128(address * Params.StateLength.U + i.U)
+      } else if (Nk == 6) {
+        ROMeKeyOut(i.U) := ROMeKeys.expandedKey192(address * Params.StateLength.U + i.U)
+      } else if (Nk == 8) {
+        ROMeKeyOut(i.U) := ROMeKeys.expandedKey256(address * Params.StateLength.U + i.U)
+      }
+    }
+  }
+
+  // The roundKey for each round can go to both the cipher and inverse cipher (for now TODO)
+  if (expandedKeyMemType == "Mem" || expandedKeyMemType == "SyncReadMem") {
+    CipherModule.io.roundKey := Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
+    InvCipherModule.io.roundKey := Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
+  } else if (expandedKeyMemType == "ROM") {
+    CipherModule.io.roundKey := ROMeKeyOut
+    InvCipherModule.io.roundKey := ROMeKeyOut
+  }
 
   // The input text can go to both the cipher and the inverse cipher (for now TODO)
   CipherModule.io.plaintext <> io.input_text
@@ -98,7 +119,9 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyM
   io.output_text <> Mux(CipherModule.io.state_out_valid, CipherModule.io.state_out, InvCipherModule.io.state_out)
 
   // Debug statements
-  //printf("AES mode=%b start=%b, mem_address=%d, mem_dataOut=%x, \n", io.AES_mode, io.start, address, dataOut)
+  //printf("address=%d, rom_dataOut=%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x%x \n", address, ROMeKeyOut(0), ROMeKeyOut(1), ROMeKeyOut(2), ROMeKeyOut(3), ROMeKeyOut(4), ROMeKeyOut(5), ROMeKeyOut(6), ROMeKeyOut(7), ROMeKeyOut(8), ROMeKeyOut(9), ROMeKeyOut(10), ROMeKeyOut(11), ROMeKeyOut(12), ROMeKeyOut(13), ROMeKeyOut(14), ROMeKeyOut(15))
+  //printf("address=%d, mem_dataOut=%x \n", address, dataOut)
+  //printf("AES mode=%b start=%b, mem_address=%d, mem_dataOut=%x \n", io.AES_mode, io.start, address, dataOut)
 }
 
 object AES {
