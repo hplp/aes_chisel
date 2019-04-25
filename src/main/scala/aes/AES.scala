@@ -35,6 +35,8 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyM
   }
   val ROMeKeyOut = RegInit(VecInit(initValues))
 
+  //TODO: update this Mem implementation to make use of Masks
+
   // A roundKey is Params.StateLength bytes, and 1+(10/12/14) (< EKDepth) of them are needed
   // Mem = combinational/asynchronous-read, sequential/synchronous-write = register banks
   // Create a asynchronous-read, synchronous-write memory block big enough for any key length
