@@ -63,3 +63,7 @@ class InvCipherRound(transform: String, InvSubBytes_SCD: Boolean) extends Module
   }
 
 }
+
+object InvCipherRound {
+  def apply(transform: String, SubBytes_SCD: Boolean): InvCipherRound = Module(new InvCipherRound(transform, SubBytes_SCD))
+}

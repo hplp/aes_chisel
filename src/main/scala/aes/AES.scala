@@ -7,7 +7,7 @@ import chisel3.util.Cat
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
 // change expandedKeyMemType= ROM, Mem, SyncReadMem
-class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String) extends Module {
+class AES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String) extends Module {
   require(Nk == 4 || Nk == 6 || Nk == 8)
   require(expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem" || expandedKeyMemType == "SyncReadMem")
   val KeyLength: Int = Nk * Params.rows
@@ -127,5 +127,5 @@ class AES(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyM
 }
 
 object AES {
-  def apply(Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String): AES = Module(new AES(Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType))
+  def apply(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String): AES = Module(new AES(Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType))
 }

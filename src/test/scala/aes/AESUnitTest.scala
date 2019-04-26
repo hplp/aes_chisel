@@ -3,7 +3,7 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class AESUnitTester(c: AES, Nk: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String) extends PeekPokeTester(c) {
+class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String) extends PeekPokeTester(c) {
   require(Nk == 4 || Nk == 6 || Nk == 8)
   require(expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem" || expandedKeyMemType == "SyncReadMem")
 
@@ -184,14 +184,15 @@ class AESTester extends ChiselFlatSpec {
   private val expandedKeyMemType = "ROM" // ROM or Mem or SyncReadMem works
   private val SubBytes_SCD = false
   private val InvSubBytes_SCD = false
-  val Nk = 6 // 4, 6, 8 [32-bit words] columns in cipher key
+  private val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
+  private val unrolled = true
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "AES"
 
   for (backendName <- backendNames) {
     "AES" should s"execute cipher and inverse cipher (with $backendName)" in {
-      Driver(() => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType), backendName) {
-        c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
+      Driver(() => new AES(Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType), backendName) {
+        c => new AESUnitTester(c, Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
       } should be(true)
     }
   }
@@ -199,8 +200,8 @@ class AESTester extends ChiselFlatSpec {
   "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
     iotesters.Driver.execute(
       Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir),
-      () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
-      c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
+      () => new AES(Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
+      c => new AESUnitTester(c, Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
     } should be(true)
   }
 
@@ -208,8 +209,8 @@ class AESTester extends ChiselFlatSpec {
     if (backendNames.contains("verilator")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
-          "--backend-name", "verilator"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
-        c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
+          "--backend-name", "verilator"), () => new AES(Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
+        c => new AESUnitTester(c, Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
       } should be(true)
     }
   }
@@ -218,8 +219,8 @@ class AESTester extends ChiselFlatSpec {
     if (backendNames.contains("firrtl")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
-          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
-        c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new AES(Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
+        c => new AESUnitTester(c, Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
       } should be(true)
     }
   }
@@ -227,8 +228,8 @@ class AESTester extends ChiselFlatSpec {
   "running with --is-verbose" should "show more about what's going on in your tester" in {
     iotesters.Driver.execute(
       Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
-        "--is-verbose"), () => new AES(Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
-      c => new AESUnitTester(c, Nk, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
+        "--is-verbose"), () => new AES(Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)) {
+      c => new AESUnitTester(c, Nk, unrolled, SubBytes_SCD, InvSubBytes_SCD, expandedKeyMemType)
     } should be(true)
   }
 

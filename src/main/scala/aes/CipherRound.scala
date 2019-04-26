@@ -63,3 +63,7 @@ class CipherRound(transform: String, SubBytes_SCD: Boolean) extends Module {
   }
 
 }
+
+object CipherRound {
+  def apply(transform: String, SubBytes_SCD: Boolean): CipherRound = Module(new CipherRound(transform, SubBytes_SCD))
+}
