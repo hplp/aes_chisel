@@ -98,9 +98,6 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
 
   printf("\nStarting AES cipher mode, sending plaintext\n")
   poke(aes_i.io.AES_mode, 2) // cipher
-  if (expandedKeyMemType == "SyncReadMem") {
-    step(1)
-  }
   poke(aes_i.io.start, 1) // send start
   step(1)
 
@@ -144,7 +141,7 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
   if (expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem") {
     step(1) // additional clk cycle for address to go from 0 to Nr
   } else if (expandedKeyMemType == "SyncReadMem") {
-    step(2) // additional clk cycles for address to go from 0 to Nr, etc.
+    step(1) // additional clk cycles for address to go from 0 to Nr, etc.
   }
   poke(aes_i.io.start, 1) // send start
   step(1)
