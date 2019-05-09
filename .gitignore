@@ -339,5 +339,4 @@ project/plugins/project/
 hs_err_pid*
 
 # synthesis directories
-test_run_dir128/*
-test_run_dir256/*
+synthesis/
