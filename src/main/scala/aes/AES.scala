@@ -51,21 +51,19 @@ class AES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Bo
   //val expandedKeySRMem = SyncReadMem(EKDepth, UInt((Params.StateLength * 8).W))
   val expandedKeySRMem = SyncReadMem(EKDepth, Vec(Params.StateLength, UInt(8.W)))
 
-  //
-  //val mask = Wire(Vec(Params.StateLength, Bool()))
-
   // use the same address and dataOut val elements to interface with the parameterized memory
   val address = RegInit(0.U(log2Ceil(EKDepth).W))
   //val dataOut = RegInit(0.U((Params.StateLength * 8).W))
-  //val dataOut = RegInit(VecInit(initValues))
   val dataOut = Wire(Vec(Params.StateLength, UInt(8.W)))
 
   when(io.AES_mode === 1.U) { // write to memory
     if (expandedKeyMemType == "Mem") {
-      expandedKeyARMem(address) := io.input_text //Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
+      expandedKeyARMem(address) := io.input_text
+      //Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
     }
     else if (expandedKeyMemType == "SyncReadMem") {
-      expandedKeySRMem(address) := io.input_text //Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
+      expandedKeySRMem(address) := io.input_text
+      //Cat(io.input_text(0), io.input_text(1), io.input_text(2), io.input_text(3), io.input_text(4), io.input_text(5), io.input_text(6), io.input_text(7), io.input_text(8), io.input_text(9), io.input_text(10), io.input_text(11), io.input_text(12), io.input_text(13), io.input_text(14), io.input_text(15))
     }
     dataOut := DontCare
     address := address + 1.U
@@ -108,8 +106,10 @@ class AES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Bo
 
   // The roundKey for each round can go to both the cipher and inverse cipher (for now TODO)
   if (expandedKeyMemType == "Mem" || expandedKeyMemType == "SyncReadMem") {
-    CipherModule.io.roundKey := dataOut //Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
-    InvCipherModule.io.roundKey := dataOut //Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
+    CipherModule.io.roundKey := dataOut
+    //Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
+    InvCipherModule.io.roundKey := dataOut
+    //Array(dataOut(127, 120), dataOut(119, 112), dataOut(111, 104), dataOut(103, 96), dataOut(95, 88), dataOut(87, 80), dataOut(79, 72), dataOut(71, 64), dataOut(63, 56), dataOut(55, 48), dataOut(47, 40), dataOut(39, 32), dataOut(31, 24), dataOut(23, 16), dataOut(15, 8), dataOut(7, 0))
   } else if (expandedKeyMemType == "ROM") {
     CipherModule.io.roundKey := ROMeKeyOut
     InvCipherModule.io.roundKey := ROMeKeyOut
