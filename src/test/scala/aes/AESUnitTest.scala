@@ -15,7 +15,6 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
 
   printf("\nStarting the tests with 4 idle cycles\n")
   poke(aes_i.io.AES_mode, 0) // off
-  poke(aes_i.io.start, 0) // off
   step(4) // test that things are fine in Idle state
 
   val input_text = Array(0x32, 0x43, 0xf6, 0xa8, 0x88, 0x5a, 0x30, 0x8d, 0x31, 0x31, 0x98, 0xa2, 0xe0, 0x37, 0x07, 0x34)
@@ -98,14 +97,12 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
 
   printf("\nStarting AES cipher mode, sending plaintext\n")
   poke(aes_i.io.AES_mode, 2) // cipher
-  poke(aes_i.io.start, 1) // send start
   step(1)
 
   // send the plaintext
   for (i <- 0 until Params.StateLength) {
     poke(aes_i.io.input_text(i), input_text(i))
   }
-  poke(aes_i.io.start, 0) // reset start
   step(1)
 
   // remaining rounds
@@ -136,34 +133,31 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
   poke(aes_i.io.AES_mode, 0) // off
   step(4)
 
-  printf("\nStarting AES inverse cipher mode, sending ciphertext\n")
-  poke(aes_i.io.AES_mode, 3) // inverse cipher
-  if (expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem") {
-    step(1) // additional clk cycle for address to go from 0 to Nr
-  } else if (expandedKeyMemType == "SyncReadMem") {
-    step(1) // additional clk cycles for address to go from 0 to Nr, etc.
-  }
-  poke(aes_i.io.start, 1) // send start
-  step(1)
-
-  // send the ciphertext
-  for (i <- 0 until Params.StateLength) {
-    poke(aes_i.io.input_text(i), cipher_output(i)) // same as state_e(i)
-  }
-  // reset start
-  poke(aes_i.io.start, 0)
-  step(1)
-
-  // remaining rounds
-  for (i <- 1 until Nrplus1) {
+    printf("\nStarting AES inverse cipher mode, sending ciphertext\n")
+    poke(aes_i.io.AES_mode, 3) // inverse cipher
+    if (expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem") {
+      step(1) // additional clk cycle for address to go from 0 to Nr
+    } else if (expandedKeyMemType == "SyncReadMem") {
+      step(1) // additional clk cycles for address to go from 0 to Nr, etc.
+    }
     step(1)
-  }
 
-  printf("\nInspecting inverse cipher output\n")
-  // verify aes cipher output
-  for (i <- 0 until Params.StateLength)
-    expect(aes_i.io.output_text(i), input_text(i))
-  expect(aes_i.io.output_valid, 1)
+    // send the ciphertext
+    for (i <- 0 until Params.StateLength) {
+      poke(aes_i.io.input_text(i), cipher_output(i)) // same as state_e(i)
+    }
+    step(1)
+
+    // remaining rounds
+    for (i <- 1 until Nrplus1) {
+      step(1)
+    }
+
+    printf("\nInspecting inverse cipher output\n")
+    // verify aes cipher output
+    for (i <- 0 until Params.StateLength)
+      expect(aes_i.io.output_text(i), input_text(i))
+    expect(aes_i.io.output_valid, 1)
 
   printf("\nStaying idle for 4 cycles\n")
   step(4)
@@ -178,10 +172,10 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
 
 class AESTester extends ChiselFlatSpec {
 
-  private val expandedKeyMemType = "ROM" // ROM or Mem or SyncReadMem works
+  private val expandedKeyMemType = "Mem" // ROM or Mem or SyncReadMem works
   private val SubBytes_SCD = false
   private val InvSubBytes_SCD = false
-  private val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
+  private val Nk = 4 // 4, 6, 8 [32-bit words] columns in cipher key
   private val unrolled = true
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "AES"

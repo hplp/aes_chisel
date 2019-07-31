@@ -113,7 +113,9 @@ class UnrolledAES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes
 
   // Instantiate CipherRound module objects
   val CipherRoundModuleARK = CipherRound("AddRoundKeyOnly", SubBytes_SCD)
-  val CipherRoundModuleCNr = Vec(Seq.fill(Nr/2-1) {Module(new CipherRound("CompleteRound", SubBytes_SCD)).io})
+  val CipherRoundModuleCNr = Vec(Seq.fill(Nr / 2 - 1) {
+    Module(new CipherRound("CompleteRound", SubBytes_SCD)).io
+  })
   val CipherRoundModuleNMC = CipherRound("NoMixColumns", SubBytes_SCD)
 
   CipherRoundModuleARK.io.state_in := io.input_text
@@ -137,33 +139,35 @@ class UnrolledAES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes
   CipherRoundModuleCNr(5).state_in := CipherRoundModuleCNr(4).state_out
   CipherRoundModuleCNr(5).roundKey := expandedKey256_06
 
-//  CipherRoundModuleCNr(6).state_in := CipherRoundModuleCNr(5).state_out
-//  CipherRoundModuleCNr(6).roundKey := expandedKey256_07
-//
-//  CipherRoundModuleCNr(7).state_in := CipherRoundModuleCNr(6).state_out
-//  CipherRoundModuleCNr(7).roundKey := expandedKey256_08
-//
-//  CipherRoundModuleCNr(8).state_in := CipherRoundModuleCNr(7).state_out
-//  CipherRoundModuleCNr(8).roundKey := expandedKey256_09
-//
-//  CipherRoundModuleCNr(9).state_in := CipherRoundModuleCNr(8).state_out
-//  CipherRoundModuleCNr(9).roundKey := expandedKey256_10
-//
-//  CipherRoundModuleCNr(10).state_in := CipherRoundModuleCNr(9).state_out
-//  CipherRoundModuleCNr(10).roundKey := expandedKey256_11
-//
-//  CipherRoundModuleCNr(11).state_in := CipherRoundModuleCNr(10).state_out
-//  CipherRoundModuleCNr(11).roundKey := expandedKey256_12
-//
-//  CipherRoundModuleCNr(12).state_in := CipherRoundModuleCNr(11).state_out
-//  CipherRoundModuleCNr(12).roundKey := expandedKey256_13
+  //  CipherRoundModuleCNr(6).state_in := CipherRoundModuleCNr(5).state_out
+  //  CipherRoundModuleCNr(6).roundKey := expandedKey256_07
+  //
+  //  CipherRoundModuleCNr(7).state_in := CipherRoundModuleCNr(6).state_out
+  //  CipherRoundModuleCNr(7).roundKey := expandedKey256_08
+  //
+  //  CipherRoundModuleCNr(8).state_in := CipherRoundModuleCNr(7).state_out
+  //  CipherRoundModuleCNr(8).roundKey := expandedKey256_09
+  //
+  //  CipherRoundModuleCNr(9).state_in := CipherRoundModuleCNr(8).state_out
+  //  CipherRoundModuleCNr(9).roundKey := expandedKey256_10
+  //
+  //  CipherRoundModuleCNr(10).state_in := CipherRoundModuleCNr(9).state_out
+  //  CipherRoundModuleCNr(10).roundKey := expandedKey256_11
+  //
+  //  CipherRoundModuleCNr(11).state_in := CipherRoundModuleCNr(10).state_out
+  //  CipherRoundModuleCNr(11).roundKey := expandedKey256_12
+  //
+  //  CipherRoundModuleCNr(12).state_in := CipherRoundModuleCNr(11).state_out
+  //  CipherRoundModuleCNr(12).roundKey := expandedKey256_13
 
   CipherRoundModuleNMC.io.state_in := CipherRoundModuleCNr(5).state_out
   CipherRoundModuleNMC.io.roundKey := expandedKey256_14
 
   // Instantiate CipherRound module objects
   val InvCipherRoundModuleARK = InvCipherRound("AddRoundKeyOnly", SubBytes_SCD)
-  val InvCipherRoundModuleCNr = Vec(Seq.fill(Nr/2-1) {Module(new InvCipherRound("CompleteRound", SubBytes_SCD)).io})
+  val InvCipherRoundModuleCNr = Vec(Seq.fill(Nr / 2 - 1) {
+    Module(new InvCipherRound("CompleteRound", SubBytes_SCD)).io
+  })
   val InvCipherRoundModuleNMC = InvCipherRound("NoMixColumns", SubBytes_SCD)
 
   InvCipherRoundModuleARK.io.state_in := io.input_text
@@ -187,26 +191,26 @@ class UnrolledAES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes
   InvCipherRoundModuleCNr(5).state_in := InvCipherRoundModuleCNr(4).state_out
   InvCipherRoundModuleCNr(5).roundKey := expandedKey256_08
 
-//  InvCipherRoundModuleCNr(6).state_in := InvCipherRoundModuleCNr(5).state_out
-//  InvCipherRoundModuleCNr(6).roundKey := expandedKey256_07
-//
-//  InvCipherRoundModuleCNr(7).state_in := InvCipherRoundModuleCNr(6).state_out
-//  InvCipherRoundModuleCNr(7).roundKey := expandedKey256_06
-//
-//  InvCipherRoundModuleCNr(8).state_in := InvCipherRoundModuleCNr(7).state_out
-//  InvCipherRoundModuleCNr(8).roundKey := expandedKey256_05
-//
-//  InvCipherRoundModuleCNr(9).state_in := InvCipherRoundModuleCNr(8).state_out
-//  InvCipherRoundModuleCNr(9).roundKey := expandedKey256_04
-//
-//  InvCipherRoundModuleCNr(10).state_in := InvCipherRoundModuleCNr(9).state_out
-//  InvCipherRoundModuleCNr(10).roundKey := expandedKey256_03
-//
-//  InvCipherRoundModuleCNr(11).state_in := InvCipherRoundModuleCNr(10).state_out
-//  InvCipherRoundModuleCNr(11).roundKey := expandedKey256_02
-//
-//  InvCipherRoundModuleCNr(12).state_in := InvCipherRoundModuleCNr(11).state_out
-//  InvCipherRoundModuleCNr(12).roundKey := expandedKey256_01
+  //  InvCipherRoundModuleCNr(6).state_in := InvCipherRoundModuleCNr(5).state_out
+  //  InvCipherRoundModuleCNr(6).roundKey := expandedKey256_07
+  //
+  //  InvCipherRoundModuleCNr(7).state_in := InvCipherRoundModuleCNr(6).state_out
+  //  InvCipherRoundModuleCNr(7).roundKey := expandedKey256_06
+  //
+  //  InvCipherRoundModuleCNr(8).state_in := InvCipherRoundModuleCNr(7).state_out
+  //  InvCipherRoundModuleCNr(8).roundKey := expandedKey256_05
+  //
+  //  InvCipherRoundModuleCNr(9).state_in := InvCipherRoundModuleCNr(8).state_out
+  //  InvCipherRoundModuleCNr(9).roundKey := expandedKey256_04
+  //
+  //  InvCipherRoundModuleCNr(10).state_in := InvCipherRoundModuleCNr(9).state_out
+  //  InvCipherRoundModuleCNr(10).roundKey := expandedKey256_03
+  //
+  //  InvCipherRoundModuleCNr(11).state_in := InvCipherRoundModuleCNr(10).state_out
+  //  InvCipherRoundModuleCNr(11).roundKey := expandedKey256_02
+  //
+  //  InvCipherRoundModuleCNr(12).state_in := InvCipherRoundModuleCNr(11).state_out
+  //  InvCipherRoundModuleCNr(12).roundKey := expandedKey256_01
 
   InvCipherRoundModuleNMC.io.state_in := InvCipherRoundModuleCNr(5).state_out
   InvCipherRoundModuleNMC.io.roundKey := expandedKey256_00
