@@ -52,6 +52,8 @@ libraryDependencies ++= Seq("chisel3", "chisel-iotesters").map {
 }
 
 scalacOptions ++= scalacOptionsVersion(scalaVersion.value)
+//scalacOptions += "-feature"
+//scalacOptions += "-deprecation"
 
 javacOptions ++= javacOptionsVersion(scalaVersion.value)
 
