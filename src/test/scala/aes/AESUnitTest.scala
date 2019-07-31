@@ -133,31 +133,26 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
   poke(aes_i.io.AES_mode, 0) // off
   step(4)
 
-    printf("\nStarting AES inverse cipher mode, sending ciphertext\n")
-    poke(aes_i.io.AES_mode, 3) // inverse cipher
-    if (expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem") {
-      step(1) // additional clk cycle for address to go from 0 to Nr
-    } else if (expandedKeyMemType == "SyncReadMem") {
-      step(1) // additional clk cycles for address to go from 0 to Nr, etc.
-    }
+  printf("\nStarting AES inverse cipher mode, sending ciphertext\n")
+  poke(aes_i.io.AES_mode, 3) // inverse cipher
+  step(1)
+
+  // send the ciphertext
+  for (i <- 0 until Params.StateLength) {
+    poke(aes_i.io.input_text(i), cipher_output(i)) // same as state_e(i)
+  }
+  step(1)
+
+  // remaining rounds
+  for (i <- 1 until Nrplus1) {
     step(1)
+  }
 
-    // send the ciphertext
-    for (i <- 0 until Params.StateLength) {
-      poke(aes_i.io.input_text(i), cipher_output(i)) // same as state_e(i)
-    }
-    step(1)
-
-    // remaining rounds
-    for (i <- 1 until Nrplus1) {
-      step(1)
-    }
-
-    printf("\nInspecting inverse cipher output\n")
-    // verify aes cipher output
-    for (i <- 0 until Params.StateLength)
-      expect(aes_i.io.output_text(i), input_text(i))
-    expect(aes_i.io.output_valid, 1)
+  printf("\nInspecting inverse cipher output\n")
+  // verify aes cipher output
+  for (i <- 0 until Params.StateLength)
+    expect(aes_i.io.output_text(i), input_text(i))
+  expect(aes_i.io.output_valid, 1)
 
   printf("\nStaying idle for 4 cycles\n")
   step(4)
@@ -172,10 +167,10 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
 
 class AESTester extends ChiselFlatSpec {
 
-  private val expandedKeyMemType = "Mem" // ROM or Mem or SyncReadMem works
+  private val expandedKeyMemType = "ROM" // ROM or Mem or SyncReadMem works
   private val SubBytes_SCD = false
   private val InvSubBytes_SCD = false
-  private val Nk = 4 // 4, 6, 8 [32-bit words] columns in cipher key
+  private val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
   private val unrolled = true
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "AES"
