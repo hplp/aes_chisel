@@ -67,7 +67,14 @@ class AES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Bo
       }
 
       // address logistics
-      when(ShiftRegister(io.AES_mode, 1) === 2.U) {
+      when(
+        if ((expandedKeyMemType == "Mem") || (expandedKeyMemType == "ROM")) {
+          (ShiftRegister(io.AES_mode, 1) === 2.U) // delay by 1 for Mem and ROM
+        }
+        else {
+          (io.AES_mode === 2.U) // no delay for SyncReadMem
+        }
+      ) {
         address := address + 1.U
       }
         .elsewhen(io.AES_mode === 3.U) {
@@ -94,7 +101,12 @@ class AES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Bo
   // Cipher starts at AES_Mode=2
   CipherModule.io.start := (io.AES_mode === 2.U)
   // Inverse Cipher starts at AES_Mode=3 and address=Nr
-  InvCipherModule.io.start := (io.AES_mode === 3.U)
+  if (expandedKeyMemType == "SyncReadMem") {
+    InvCipherModule.io.start := (ShiftRegister(io.AES_mode, 1) === 3.U) // delay by 1 for SyncReadMem
+  }
+  else {
+    InvCipherModule.io.start := (io.AES_mode === 3.U) // no delay for Mem and ROM
+  }
 
   // AES output_valid can be the Cipher.output_valid OR InvCipher.output_valid
   io.output_valid := CipherModule.io.state_out_valid || InvCipherModule.io.state_out_valid

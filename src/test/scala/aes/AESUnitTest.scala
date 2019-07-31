@@ -148,6 +148,10 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
     step(1)
   }
 
+  if (expandedKeyMemType == "SyncReadMem") {
+    step(1) // InvCipher takes 1 extra clk for SyncReadMem
+  }
+
   printf("\nInspecting inverse cipher output\n")
   // verify aes cipher output
   for (i <- 0 until Params.StateLength)
@@ -167,7 +171,7 @@ class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, I
 
 class AESTester extends ChiselFlatSpec {
 
-  private val expandedKeyMemType = "ROM" // ROM or Mem or SyncReadMem works
+  private val expandedKeyMemType = "SyncReadMem" // ROM or Mem or SyncReadMem works
   private val SubBytes_SCD = false
   private val InvSubBytes_SCD = false
   private val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
