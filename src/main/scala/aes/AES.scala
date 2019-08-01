@@ -2,7 +2,6 @@ package aes
 
 import chisel3._
 import chisel3.util._
-import chisel3.util.log2Ceil
 
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
