@@ -4,7 +4,7 @@ import chisel3._
 
 // implements AES_Decrypt round transforms
 class InvCipherRound(transform: String, InvSubBytes_SCD: Boolean) extends Module {
-  require(transform == "AddRoundKeyOnly" || transform == "NoMixColumns" || transform == "CompleteRound")
+  require(transform == "AddRoundKeyOnly" || transform == "NoInvMixColumns" || transform == "CompleteRound")
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
     val roundKey = Input(Vec(Params.StateLength, UInt(8.W)))
@@ -23,7 +23,7 @@ class InvCipherRound(transform: String, InvSubBytes_SCD: Boolean) extends Module
     // output
     io.state_out := AddRoundKeyModule.io.state_out
 
-  } else if (transform == "NoMixColumns") {
+  } else if (transform == "NoInvMixColumns") {
 
     // Instantiate module objects
     val AddRoundKeyModule = AddRoundKey()

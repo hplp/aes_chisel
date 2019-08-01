@@ -4,7 +4,7 @@ import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 class InvCipherRoundUnitTester(c: InvCipherRound, transform: String, InvSubBytes_SCD: Boolean) extends PeekPokeTester(c) {
-  require(transform == "AddRoundKeyOnly" || transform == "NoMixColumns" || transform == "CompleteRound")
+  require(transform == "AddRoundKeyOnly" || transform == "NoInvMixColumns" || transform == "CompleteRound")
 
   private val aes_icipher_round = c
 
@@ -12,13 +12,13 @@ class InvCipherRoundUnitTester(c: InvCipherRound, transform: String, InvSubBytes
   val roundKey = Array(0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f)
 
   val state_out_ARK = Array(0x32, 0x42, 0xf4, 0xab, 0x8c, 0x5f, 0x36, 0x8a, 0x39, 0x38, 0x92, 0xa9, 0xec, 0x3a, 0x9, 0x3b)
-  val state_out3_NMC = Array(0xa1, 0xb3, 0xe0, 0xb7, 0x93, 0x61, 0x3e, 0x1d, 0x26, 0x4f, 0xdc, 0x23, 0xac, 0x23, 0x6, 0x60)
-  val state_out2_C = Array(0xc1, 0x5e, 0xa, 0xd0, 0xed, 0x37, 0xf9, 0xf2, 0x7b, 0x93, 0xb6, 0xc8, 0xd7, 0x9e, 0xb4, 0x14)
+  val state_out_NMC = Array(0xa1, 0xb3, 0xe0, 0xb7, 0x93, 0x61, 0x3e, 0x1d, 0x26, 0x4f, 0xdc, 0x23, 0xac, 0x23, 0x6, 0x60)
+  val state_out_C = Array(0xc1, 0x5e, 0xa, 0xd0, 0xed, 0x37, 0xf9, 0xf2, 0x7b, 0x93, 0xb6, 0xc8, 0xd7, 0x9e, 0xb4, 0x14)
 
   val state_out = transform match {
     case "AddRoundKeyOnly" => state_out_ARK
-    case "NoMixColumns" => state_out3_NMC
-    case "CompleteRound" => state_out2_C
+    case "NoInvMixColumns" => state_out_NMC
+    case "CompleteRound" => state_out_C
   }
 
   step(4) // test that things are fine in Idle state
@@ -32,6 +32,7 @@ class InvCipherRoundUnitTester(c: InvCipherRound, transform: String, InvSubBytes
     poke(aes_icipher_round.io.roundKey(j), roundKey(j))
   step(1)
 
+  // check output
   for (i <- 0 until Params.StateLength)
     expect(aes_icipher_round.io.state_out(i), state_out(i))
 
@@ -44,7 +45,7 @@ class InvCipherRoundUnitTester(c: InvCipherRound, transform: String, InvSubBytes
 
 class InvCipherRoundTester extends ChiselFlatSpec {
 
-  private val transform = "CompleteRound" // AddRoundKeyOnly NoMixColumns CompleteRound
+  private val transform = "CompleteRound" // AddRoundKeyOnly NoInvMixColumns CompleteRound
   private val InvSubBytes_SCD = false
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "InvCipherRound"

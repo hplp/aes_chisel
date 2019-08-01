@@ -1,7 +1,7 @@
 package aes
 
 import chisel3._
-import chisel3.util.{Cat, log2Ceil}
+import chisel3.util._
 
 // implements wrapper for AES cipher and inverse cipher
 // change Nk=4 for AES128, NK=6 for AES192, Nk=8 for AES256
@@ -168,7 +168,7 @@ class UnrolledAES(Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes
   val InvCipherRoundModuleCNr = Vec(Seq.fill(Nr / 2 - 1) {
     Module(new InvCipherRound("CompleteRound", SubBytes_SCD)).io
   })
-  val InvCipherRoundModuleNMC = InvCipherRound("NoMixColumns", SubBytes_SCD)
+  val InvCipherRoundModuleNMC = InvCipherRound("NoInvMixColumns", SubBytes_SCD)
 
   InvCipherRoundModuleARK.io.state_in := io.input_text
   InvCipherRoundModuleARK.io.roundKey := expandedKey256_14
