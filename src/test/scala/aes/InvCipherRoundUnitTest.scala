@@ -30,11 +30,15 @@ class InvCipherRoundUnitTester(c: InvCipherRound, transform: String, InvSubBytes
   // send the round key
   for (j <- 0 until Params.StateLength)
     poke(aes_icipher_round.io.roundKey(j), roundKey(j))
+  // send input valid
+  poke(aes_icipher_round.io.input_valid, 1)
   step(1)
+  poke(aes_icipher_round.io.input_valid, 0)
 
   // check output
   for (i <- 0 until Params.StateLength)
     expect(aes_icipher_round.io.state_out(i), state_out(i))
+  expect(aes_icipher_round.io.output_valid, 1)
 
   step(4)
 }

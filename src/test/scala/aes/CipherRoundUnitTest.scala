@@ -30,11 +30,15 @@ class CipherRoundUnitTester(c: CipherRound, transform: String, SubBytes_SCD: Boo
   // send the round key
   for (j <- 0 until Params.StateLength)
     poke(aes_cipher_round.io.roundKey(j), roundKey(j))
+  // send input valid
+  poke(aes_cipher_round.io.input_valid, 1)
   step(1)
+  poke(aes_cipher_round.io.input_valid, 0)
 
   // check output
   for (i <- 0 until Params.StateLength)
     expect(aes_cipher_round.io.state_out(i), state_out(i))
+  expect(aes_cipher_round.io.output_valid, 1)
 
   step(4)
 }
