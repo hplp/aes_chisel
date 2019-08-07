@@ -26,9 +26,7 @@ class Cipher(Nk: Int, SubBytes_SCD: Boolean) extends Module {
   val MixColumnsModule = MixColumns()
 
   // Internal variables
-  val initValues = Seq.fill(Params.StateLength) {
-    0.U(8.W)
-  }
+  val initValues = Seq.fill(Params.StateLength)(0.U(8.W))
   val state = RegInit(VecInit(initValues))
   val rounds = RegInit(0.U(4.W))
 

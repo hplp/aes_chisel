@@ -3,7 +3,7 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class AESUnitTester(c: AES, Nk: Int, unrolled: Boolean, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String) extends PeekPokeTester(c) {
+class AESUnitTester(c: AES, Nk: Int, unrolled: Int, SubBytes_SCD: Boolean, InvSubBytes_SCD: Boolean, expandedKeyMemType: String) extends PeekPokeTester(c) {
   require(Nk == 4 || Nk == 6 || Nk == 8)
   require(expandedKeyMemType == "ROM" || expandedKeyMemType == "Mem" || expandedKeyMemType == "SyncReadMem")
 
@@ -175,7 +175,7 @@ class AESTester extends ChiselFlatSpec {
   private val SubBytes_SCD = false
   private val InvSubBytes_SCD = false
   private val Nk = 8 // 4, 6, 8 [32-bit words] columns in cipher key
-  private val unrolled = true
+  private val unrolled = 14
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "AES"
 
