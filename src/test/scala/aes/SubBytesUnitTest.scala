@@ -3,7 +3,7 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class SubBytesUnitTester(c: SubBytes, SCD: Boolean) extends PeekPokeTester(c) {
+class SubBytesUnitTester(c: SubBytes, SCD: Boolean, Pipelined: Boolean) extends PeekPokeTester(c) {
 
   def computeSubBytes(state_in: Array[Int]): Array[Int] = {
     var s_box = Array(
@@ -37,15 +37,20 @@ class SubBytesUnitTester(c: SubBytes, SCD: Boolean) extends PeekPokeTester(c) {
 
   for (i <- 0 until Params.StateLength)
     poke(aes_sb.io.state_in(i), state(i))
-  step(1)
 
   state = computeSubBytes(state)
   println(state.deep.mkString(" "))
 
+  if (Pipelined) {
+    step(2)
+  } else {
+    step(1)
+  }
+
   for (i <- 0 until Params.StateLength)
     expect(aes_sb.io.state_out(i), state(i))
 
-  step(20)
+  step(4)
 }
 
 // Run test with:
@@ -54,22 +59,23 @@ class SubBytesUnitTester(c: SubBytes, SCD: Boolean) extends PeekPokeTester(c) {
 
 class SubBytesTester extends ChiselFlatSpec {
 
-  private val SCD = true
+  private val SCD = false
+  private val Pipelined = false // [false -> 640 LUTs, true -> 608 LUTs and 128 FFs]
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "SubBytes"
 
   for (backendName <- backendNames) {
     "SubBytes" should s"execute AES SubBytes (with $backendName)" in {
-      Driver(() => new SubBytes(SCD), backendName) {
-        c => new SubBytesUnitTester(c, SCD)
+      Driver(() => new SubBytes(SCD, Pipelined), backendName) {
+        c => new SubBytesUnitTester(c, SCD, Pipelined)
       } should be(true)
     }
   }
 
   "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
     iotesters.Driver.execute(
-      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new SubBytes(SCD)) {
-      c => new SubBytesUnitTester(c, SCD)
+      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new SubBytes(SCD, Pipelined)) {
+      c => new SubBytesUnitTester(c, SCD, Pipelined)
     } should be(true)
   }
 
@@ -77,8 +83,8 @@ class SubBytesTester extends ChiselFlatSpec {
     if (backendNames.contains("verilator")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
-          "--backend-name", "verilator"), () => new SubBytes(SCD)) {
-        c => new SubBytesUnitTester(c, SCD)
+          "--backend-name", "verilator"), () => new SubBytes(SCD, Pipelined)) {
+        c => new SubBytesUnitTester(c, SCD, Pipelined)
       } should be(true)
     }
   }
@@ -87,8 +93,8 @@ class SubBytesTester extends ChiselFlatSpec {
     if (backendNames.contains("firrtl")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
-          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new SubBytes(SCD)) {
-        c => new SubBytesUnitTester(c, SCD)
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new SubBytes(SCD, Pipelined)) {
+        c => new SubBytesUnitTester(c, SCD, Pipelined)
       } should be(true)
     }
   }
@@ -96,8 +102,8 @@ class SubBytesTester extends ChiselFlatSpec {
   "running with --is-verbose" should "show more about what's going on in your tester" in {
     iotesters.Driver.execute(
       Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
-        "--is-verbose"), () => new SubBytes(SCD)) {
-      c => new SubBytesUnitTester(c, SCD)
+        "--is-verbose"), () => new SubBytes(SCD, Pipelined)) {
+      c => new SubBytesUnitTester(c, SCD, Pipelined)
     } should be(true)
   }
 

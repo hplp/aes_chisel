@@ -5,7 +5,7 @@ import chisel3.util._
 import lfsr.LFSR
 
 // implements SubBytes
-class SubBytes(SCD: Boolean) extends Module {
+class SubBytes(SCD: Boolean = false, Pipelined: Boolean = false) extends Module {
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
@@ -30,7 +30,11 @@ class SubBytes(SCD: Boolean) extends Module {
     0x8c.U, 0xa1.U, 0x89.U, 0x0d.U, 0xbf.U, 0xe6.U, 0x42.U, 0x68.U, 0x41.U, 0x99.U, 0x2d.U, 0x0f.U, 0xb0.U, 0x54.U, 0xbb.U, 0x16.U))
 
   for (i <- 0 until Params.StateLength) {
-    io.state_out(i) := s_box(io.state_in(i))
+    if (Pipelined) {
+      io.state_out(i) := ShiftRegister(s_box(io.state_in(i)), 1)
+    } else {
+      io.state_out(i) := s_box(io.state_in(i))
+    }
   }
 
   if (SCD) {
@@ -47,5 +51,5 @@ class SubBytes(SCD: Boolean) extends Module {
 }
 
 object SubBytes {
-  def apply(SCD: Boolean): SubBytes = Module(new SubBytes(SCD))
+  def apply(SCD: Boolean = false, Pipelined: Boolean = false): SubBytes = Module(new SubBytes(SCD, Pipelined))
 }

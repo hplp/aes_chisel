@@ -5,7 +5,7 @@ import chisel3.util._
 import lfsr.LFSR
 
 // implements InvSubBytes
-class InvSubBytes(SCD: Boolean) extends Module {
+class InvSubBytes(SCD: Boolean = false, Pipelined: Boolean = false) extends Module {
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
@@ -30,8 +30,13 @@ class InvSubBytes(SCD: Boolean) extends Module {
     0x17.U, 0x2b.U, 0x04.U, 0x7e.U, 0xba.U, 0x77.U, 0xd6.U, 0x26.U, 0xe1.U, 0x69.U, 0x14.U, 0x63.U, 0x55.U, 0x21.U, 0x0c.U, 0x7d.U))
 
   for (i <- 0 until Params.StateLength) {
-    io.state_out(i) := inverted_s_box(io.state_in(i))
+    if (Pipelined) {
+      io.state_out(i) := ShiftRegister(inverted_s_box(io.state_in(i)), 1)
+    } else {
+      io.state_out(i) := inverted_s_box(io.state_in(i))
+    }
   }
+
   if (SCD) {
     // dummy noise module with LFSR
     val LFSRModule = LFSR()
@@ -46,5 +51,5 @@ class InvSubBytes(SCD: Boolean) extends Module {
 }
 
 object InvSubBytes {
-  def apply(SCD: Boolean): InvSubBytes = Module(new InvSubBytes(SCD))
+  def apply(SCD: Boolean = false, Pipelined: Boolean = false): InvSubBytes = Module(new InvSubBytes(SCD, Pipelined))
 }
