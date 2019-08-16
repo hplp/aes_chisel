@@ -2,6 +2,9 @@ package aes
 
 import chisel3._
 
+// I think there is a bug in Chisel; it should be fine to use each val in other Chisel modules with Tables.val_name
+// and it actually works when running a single test, but not when running more than one test
+
 object ROMeKeys {
   val roundKey128 = VecInit(Array(
     0x00.U, 0x01.U, 0x02.U, 0x03.U, 0x04.U, 0x05.U, 0x06.U, 0x07.U, 0x08.U, 0x09.U, 0x0a.U, 0x0b.U, 0x0c.U, 0x0d.U, 0x0e.U, 0x0f.U))

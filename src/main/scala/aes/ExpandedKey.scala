@@ -3,8 +3,7 @@ package aes
 import chisel3._
 
 // This module is not used and the file can be deleted.
-// The objective of this file was to have an implementation where the expanded key
-// is not configurable at runtime.
+// This file is same as ROMeKeys.scala except it doesn't have the detailed indexing
 
 object ExpandedKey {
   val roundKey128 = VecInit(Array(0x00.U, 0x01.U, 0x02.U, 0x03.U, 0x04.U, 0x05.U, 0x06.U, 0x07.U, 0x08.U, 0x09.U, 0x0a.U, 0x0b.U, 0x0c.U, 0x0d.U, 0x0e.U, 0x0f.U))
