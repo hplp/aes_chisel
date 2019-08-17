@@ -1,9 +1,10 @@
 package aes
 
 import chisel3._
+import chisel3.util._
 
 // implements AddRoundKey
-class AddRoundKey extends Module {
+class AddRoundKey(Pipelined: Boolean = false) extends Module {
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
     val roundKey = Input(Vec(Params.StateLength, UInt(8.W)))
@@ -11,10 +12,14 @@ class AddRoundKey extends Module {
   })
 
   for (i <- 0 until Params.StateLength) {
-    io.state_out(i) := io.state_in(i) ^ io.roundKey(i)
+    if (Pipelined) {
+      io.state_out(i) := ShiftRegister(io.state_in(i) ^ io.roundKey(i), 1)
+    } else {
+      io.state_out(i) := io.state_in(i) ^ io.roundKey(i)
+    }
   }
 }
 
 object AddRoundKey {
-  def apply(): AddRoundKey = Module(new AddRoundKey())
+  def apply(Pipelined: Boolean = false): AddRoundKey = Module(new AddRoundKey(Pipelined))
 }

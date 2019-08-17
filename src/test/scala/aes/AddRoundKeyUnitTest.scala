@@ -3,7 +3,7 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
+class AddRoundKeyUnitTester(c: AddRoundKey, Pipelined: Boolean) extends PeekPokeTester(c) {
 
   def computeAddRoundKey(state_in: Array[Int], roundKey: Array[Int]): Array[Int] = {
 
@@ -24,10 +24,15 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
     poke(aes_ark.io.state_in(i), state(i))
     poke(aes_ark.io.roundKey(i), roundKey(i))
   }
-  step(1)
 
   state = computeAddRoundKey(state, roundKey)
   println(state.deep.mkString(" "))
+
+  if (Pipelined) {
+    step(2)
+  } else {
+    step(1)
+  }
 
   for (i <- 0 until Params.StateLength)
     expect(aes_ark.io.state_out(i), state(i))
@@ -39,21 +44,22 @@ class AddRoundKeyUnitTester(c: AddRoundKey) extends PeekPokeTester(c) {
 
 class AddRoundKeyTester extends ChiselFlatSpec {
 
+  private val Pipelined = true // [false -> 127 LUTs, true -> 64 LUTs and 128 FFs]
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "AddRoundKey"
 
   for (backendName <- backendNames) {
     "AddRoundKey" should s"execute AES AddRoundKey (with $backendName)" in {
-      Driver(() => new AddRoundKey, backendName) {
-        c => new AddRoundKeyUnitTester(c)
+      Driver(() => new AddRoundKey(Pipelined), backendName) {
+        c => new AddRoundKeyUnitTester(c, Pipelined)
       } should be(true)
     }
   }
 
   "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
     iotesters.Driver.execute(
-      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new AddRoundKey) {
-      c => new AddRoundKeyUnitTester(c)
+      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new AddRoundKey(Pipelined)) {
+      c => new AddRoundKeyUnitTester(c, Pipelined)
     } should be(true)
   }
 
@@ -61,8 +67,8 @@ class AddRoundKeyTester extends ChiselFlatSpec {
     if (backendNames.contains("verilator")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
-          "--backend-name", "verilator"), () => new AddRoundKey) {
-        c => new AddRoundKeyUnitTester(c)
+          "--backend-name", "verilator"), () => new AddRoundKey(Pipelined)) {
+        c => new AddRoundKeyUnitTester(c, Pipelined)
       } should be(true)
     }
   }
@@ -71,8 +77,8 @@ class AddRoundKeyTester extends ChiselFlatSpec {
     if (backendNames.contains("firrtl")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
-          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new AddRoundKey) {
-        c => new AddRoundKeyUnitTester(c)
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new AddRoundKey(Pipelined)) {
+        c => new AddRoundKeyUnitTester(c, Pipelined)
       } should be(true)
     }
   }
@@ -80,8 +86,8 @@ class AddRoundKeyTester extends ChiselFlatSpec {
   "running with --is-verbose" should "show more about what's going on in your tester" in {
     iotesters.Driver.execute(
       Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
-        "--is-verbose"), () => new AddRoundKey) {
-      c => new AddRoundKeyUnitTester(c)
+        "--is-verbose"), () => new AddRoundKey(Pipelined)) {
+      c => new AddRoundKeyUnitTester(c, Pipelined)
     } should be(true)
   }
 
