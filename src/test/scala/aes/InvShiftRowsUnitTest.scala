@@ -5,6 +5,7 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
 class InvShiftRowsUnitTester(c: InvShiftRows) extends PeekPokeTester(c) {
 
+  // InvShiftRows in Scala
   def computeInvShiftRows(state_in: Array[Int]): Array[Int] = {
     var state_out = new Array[Int](Params.StateLength)
 
@@ -36,11 +37,14 @@ class InvShiftRowsUnitTester(c: InvShiftRows) extends PeekPokeTester(c) {
 
   for (i <- 0 until Params.StateLength)
     poke(aes_isr.io.state_in(i), state(i))
-  step(1)
 
+  // run in Scala
   state = computeInvShiftRows(state)
   println(state.deep.mkString(" "))
 
+  step(1)
+
+  // match chisel and Scala
   for (i <- 0 until Params.StateLength)
     expect(aes_isr.io.state_out(i), state(i))
 }

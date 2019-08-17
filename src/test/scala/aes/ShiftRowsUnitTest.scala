@@ -37,18 +37,19 @@ class ShiftRowsUnitTester(c: ShiftRows) extends PeekPokeTester(c) {
 
   for (i <- 0 until Params.StateLength)
     poke(aes_sr.io.state_in(i), state(i))
-  step(1)
 
   // run in Scala
   state = computeShiftRows(state)
   println(state.deep.mkString(" "))
+
+  step(1)
 
   // match chisel and Scala
   for (i <- 0 until Params.StateLength)
     expect(aes_sr.io.state_out(i), state(i))
 }
 
-// Run with:
+// Run test with:
 //    sbt 'testOnly aes.ShiftRowsTester'
 // or sbt 'testOnly aes.ShiftRowsTester -- -z verbose'
 // or sbt 'testOnly aes.ShiftRowsTester -- -z vcd'
