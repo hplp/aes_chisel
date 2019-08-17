@@ -1,9 +1,10 @@
 package aes
 
 import chisel3._
+import chisel3.util._
 
 // implements InvMixColumns
-class InvMixColumns extends Module {
+class InvMixColumns(Pipelined: Boolean = false) extends Module {
   val io = IO(new Bundle {
     val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
@@ -119,27 +120,35 @@ class InvMixColumns extends Module {
     0x37.U, 0x39.U, 0x2b.U, 0x25.U, 0x0f.U, 0x01.U, 0x13.U, 0x1d.U, 0x47.U, 0x49.U, 0x5b.U, 0x55.U, 0x7f.U, 0x71.U, 0x63.U, 0x6d.U,
     0xd7.U, 0xd9.U, 0xcb.U, 0xc5.U, 0xef.U, 0xe1.U, 0xf3.U, 0xfd.U, 0xa7.U, 0xa9.U, 0xbb.U, 0xb5.U, 0x9f.U, 0x91.U, 0x83.U, 0x8d.U))
 
-  io.state_out(0) := mul14(io.state_in(0)) ^ mul11(io.state_in(1)) ^ mul13(io.state_in(2)) ^ mul09(io.state_in(3))
-  io.state_out(1) := mul09(io.state_in(0)) ^ mul14(io.state_in(1)) ^ mul11(io.state_in(2)) ^ mul13(io.state_in(3))
-  io.state_out(2) := mul13(io.state_in(0)) ^ mul09(io.state_in(1)) ^ mul14(io.state_in(2)) ^ mul11(io.state_in(3))
-  io.state_out(3) := mul11(io.state_in(0)) ^ mul13(io.state_in(1)) ^ mul09(io.state_in(2)) ^ mul14(io.state_in(3))
+  val tmp_state = Wire(Vec(Params.StateLength, UInt(8.W)))
 
-  io.state_out(4) := mul14(io.state_in(4)) ^ mul11(io.state_in(5)) ^ mul13(io.state_in(6)) ^ mul09(io.state_in(7))
-  io.state_out(5) := mul09(io.state_in(4)) ^ mul14(io.state_in(5)) ^ mul11(io.state_in(6)) ^ mul13(io.state_in(7))
-  io.state_out(6) := mul13(io.state_in(4)) ^ mul09(io.state_in(5)) ^ mul14(io.state_in(6)) ^ mul11(io.state_in(7))
-  io.state_out(7) := mul11(io.state_in(4)) ^ mul13(io.state_in(5)) ^ mul09(io.state_in(6)) ^ mul14(io.state_in(7))
+  tmp_state(0) := mul14(io.state_in(0)) ^ mul11(io.state_in(1)) ^ mul13(io.state_in(2)) ^ mul09(io.state_in(3))
+  tmp_state(1) := mul09(io.state_in(0)) ^ mul14(io.state_in(1)) ^ mul11(io.state_in(2)) ^ mul13(io.state_in(3))
+  tmp_state(2) := mul13(io.state_in(0)) ^ mul09(io.state_in(1)) ^ mul14(io.state_in(2)) ^ mul11(io.state_in(3))
+  tmp_state(3) := mul11(io.state_in(0)) ^ mul13(io.state_in(1)) ^ mul09(io.state_in(2)) ^ mul14(io.state_in(3))
 
-  io.state_out(8) := mul14(io.state_in(8)) ^ mul11(io.state_in(9)) ^ mul13(io.state_in(10)) ^ mul09(io.state_in(11))
-  io.state_out(9) := mul09(io.state_in(8)) ^ mul14(io.state_in(9)) ^ mul11(io.state_in(10)) ^ mul13(io.state_in(11))
-  io.state_out(10) := mul13(io.state_in(8)) ^ mul09(io.state_in(9)) ^ mul14(io.state_in(10)) ^ mul11(io.state_in(11))
-  io.state_out(11) := mul11(io.state_in(8)) ^ mul13(io.state_in(9)) ^ mul09(io.state_in(10)) ^ mul14(io.state_in(11))
+  tmp_state(4) := mul14(io.state_in(4)) ^ mul11(io.state_in(5)) ^ mul13(io.state_in(6)) ^ mul09(io.state_in(7))
+  tmp_state(5) := mul09(io.state_in(4)) ^ mul14(io.state_in(5)) ^ mul11(io.state_in(6)) ^ mul13(io.state_in(7))
+  tmp_state(6) := mul13(io.state_in(4)) ^ mul09(io.state_in(5)) ^ mul14(io.state_in(6)) ^ mul11(io.state_in(7))
+  tmp_state(7) := mul11(io.state_in(4)) ^ mul13(io.state_in(5)) ^ mul09(io.state_in(6)) ^ mul14(io.state_in(7))
 
-  io.state_out(12) := mul14(io.state_in(12)) ^ mul11(io.state_in(13)) ^ mul13(io.state_in(14)) ^ mul09(io.state_in(15))
-  io.state_out(13) := mul09(io.state_in(12)) ^ mul14(io.state_in(13)) ^ mul11(io.state_in(14)) ^ mul13(io.state_in(15))
-  io.state_out(14) := mul13(io.state_in(12)) ^ mul09(io.state_in(13)) ^ mul14(io.state_in(14)) ^ mul11(io.state_in(15))
-  io.state_out(15) := mul11(io.state_in(12)) ^ mul13(io.state_in(13)) ^ mul09(io.state_in(14)) ^ mul14(io.state_in(15))
+  tmp_state(8) := mul14(io.state_in(8)) ^ mul11(io.state_in(9)) ^ mul13(io.state_in(10)) ^ mul09(io.state_in(11))
+  tmp_state(9) := mul09(io.state_in(8)) ^ mul14(io.state_in(9)) ^ mul11(io.state_in(10)) ^ mul13(io.state_in(11))
+  tmp_state(10) := mul13(io.state_in(8)) ^ mul09(io.state_in(9)) ^ mul14(io.state_in(10)) ^ mul11(io.state_in(11))
+  tmp_state(11) := mul11(io.state_in(8)) ^ mul13(io.state_in(9)) ^ mul09(io.state_in(10)) ^ mul14(io.state_in(11))
+
+  tmp_state(12) := mul14(io.state_in(12)) ^ mul11(io.state_in(13)) ^ mul13(io.state_in(14)) ^ mul09(io.state_in(15))
+  tmp_state(13) := mul09(io.state_in(12)) ^ mul14(io.state_in(13)) ^ mul11(io.state_in(14)) ^ mul13(io.state_in(15))
+  tmp_state(14) := mul13(io.state_in(12)) ^ mul09(io.state_in(13)) ^ mul14(io.state_in(14)) ^ mul11(io.state_in(15))
+  tmp_state(15) := mul11(io.state_in(12)) ^ mul13(io.state_in(13)) ^ mul09(io.state_in(14)) ^ mul14(io.state_in(15))
+
+  if (Pipelined) {
+    io.state_out := ShiftRegister(tmp_state, 1)
+  } else {
+    io.state_out := tmp_state
+  }
 }
 
 object InvMixColumns {
-  def apply(): InvMixColumns = Module(new InvMixColumns())
+  def apply(Pipelined: Boolean = false): InvMixColumns = Module(new InvMixColumns(Pipelined))
 }

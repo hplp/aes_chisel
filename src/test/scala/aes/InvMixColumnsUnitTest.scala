@@ -3,7 +3,7 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class InvMixColumnsUnitTester(c: InvMixColumns) extends PeekPokeTester(c) {
+class InvMixColumnsUnitTester(c: InvMixColumns, Pipelined: Boolean) extends PeekPokeTester(c) {
 
   def computeInvMixColumns(state_in: Array[Int]): Array[Int] = {
     var state_out = new Array[Int](Params.StateLength)
@@ -146,10 +146,15 @@ class InvMixColumnsUnitTester(c: InvMixColumns) extends PeekPokeTester(c) {
 
   for (i <- 0 until Params.StateLength)
     poke(aes_imc.io.state_in(i), state(i))
-  step(1)
 
   state = computeInvMixColumns(state)
   println(state.deep.mkString(" "))
+
+  if (Pipelined) {
+    step(2)
+  } else {
+    step(1)
+  }
 
   for (i <- 0 until Params.StateLength)
     expect(aes_imc.io.state_out(i), state(i))
@@ -161,21 +166,22 @@ class InvMixColumnsUnitTester(c: InvMixColumns) extends PeekPokeTester(c) {
 
 class InvMixColumnsTester extends ChiselFlatSpec {
 
+  private val Pipelined = false // [false -> 240 LUTs, true -> 236 LUTs and 128 FFs]
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "InvMixColumns"
 
   for (backendName <- backendNames) {
     "InvMixColumns" should s"execute AES InvMixColumns (with $backendName)" in {
-      Driver(() => new InvMixColumns, backendName) {
-        c => new InvMixColumnsUnitTester(c)
+      Driver(() => new InvMixColumns(Pipelined), backendName) {
+        c => new InvMixColumnsUnitTester(c, Pipelined)
       } should be(true)
     }
   }
 
   "Basic test using Driver.execute" should "be used as an alternative way to run specification" in {
     iotesters.Driver.execute(
-      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new InvMixColumns) {
-      c => new InvMixColumnsUnitTester(c)
+      Array("--target-dir", "test_run_dir/" + dir + "_basic_test", "--top-name", dir), () => new InvMixColumns(Pipelined)) {
+      c => new InvMixColumnsUnitTester(c, Pipelined)
     } should be(true)
   }
 
@@ -183,8 +189,8 @@ class InvMixColumnsTester extends ChiselFlatSpec {
     if (backendNames.contains("verilator")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_verilator_test", "--top-name", dir,
-          "--backend-name", "verilator"), () => new InvMixColumns) {
-        c => new InvMixColumnsUnitTester(c)
+          "--backend-name", "verilator"), () => new InvMixColumns(Pipelined)) {
+        c => new InvMixColumnsUnitTester(c, Pipelined)
       } should be(true)
     }
   }
@@ -193,8 +199,8 @@ class InvMixColumnsTester extends ChiselFlatSpec {
     if (backendNames.contains("firrtl")) {
       iotesters.Driver.execute(
         Array("--target-dir", "test_run_dir/" + dir + "_firrtl_test", "--top-name", dir,
-          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new InvMixColumns) {
-        c => new InvMixColumnsUnitTester(c)
+          "--backend-name", "firrtl", "--generate-vcd-output", "on"), () => new InvMixColumns(Pipelined)) {
+        c => new InvMixColumnsUnitTester(c, Pipelined)
       } should be(true)
     }
   }
@@ -202,8 +208,8 @@ class InvMixColumnsTester extends ChiselFlatSpec {
   "running with --is-verbose" should "show more about what's going on in your tester" in {
     iotesters.Driver.execute(
       Array("--target-dir", "test_run_dir/" + dir + "_verbose_test", "--top-name", dir,
-        "--is-verbose"), () => new InvMixColumns) {
-      c => new InvMixColumnsUnitTester(c)
+        "--is-verbose"), () => new InvMixColumns(Pipelined)) {
+      c => new InvMixColumnsUnitTester(c, Pipelined)
     } should be(true)
   }
 
