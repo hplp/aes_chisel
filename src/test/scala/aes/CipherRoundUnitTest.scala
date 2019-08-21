@@ -3,7 +3,7 @@ package aes
 import chisel3.iotesters
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class CipherRoundUnitTester(c: CipherRound, transform: String, SubBytes_SCD: Boolean) extends PeekPokeTester(c) {
+class CipherRoundUnitTester(c: CipherRound, transform: String, SubBytes_SCD: Boolean = false) extends PeekPokeTester(c) {
   require(transform == "AddRoundKeyOnly" || transform == "NoMixColumns" || transform == "CompleteRound")
 
   private val aes_cipher_round = c
@@ -49,7 +49,7 @@ class CipherRoundUnitTester(c: CipherRound, transform: String, SubBytes_SCD: Boo
 
 class CipherRoundTester extends ChiselFlatSpec {
 
-  private val transform = "CompleteRound" // AddRoundKeyOnly NoMixColumns CompleteRound
+  private val transform = "NoMixColumns" // AddRoundKeyOnly NoMixColumns CompleteRound
   private val SubBytes_SCD = false
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "CipherRound"

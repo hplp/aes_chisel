@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 
 // implements AES_Encrypt round transforms
-class CipherRound(transform: String, SubBytes_SCD: Boolean) extends Module {
+class CipherRound(transform: String, SubBytes_SCD: Boolean = false) extends Module {
   require(transform == "AddRoundKeyOnly" || transform == "NoMixColumns" || transform == "CompleteRound")
   val io = IO(new Bundle {
     val input_valid = Input(Bool())
@@ -86,11 +86,10 @@ class CipherRound(transform: String, SubBytes_SCD: Boolean) extends Module {
     // output
     io.state_out := ShiftRegister(AddRoundKeyModule.io.state_out, 1)
     io.output_valid := ShiftRegister(io.input_valid, 1)
-
   }
 
 }
 
 object CipherRound {
-  def apply(transform: String, SubBytes_SCD: Boolean): CipherRound = Module(new CipherRound(transform, SubBytes_SCD))
+  def apply(transform: String, SubBytes_SCD: Boolean = false): CipherRound = Module(new CipherRound(transform, SubBytes_SCD))
 }
