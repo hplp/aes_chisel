@@ -340,3 +340,6 @@ hs_err_pid*
 
 # synthesis directories
 synthesis/
+
+# scratch
+test_data.txt

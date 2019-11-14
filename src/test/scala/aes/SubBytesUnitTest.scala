@@ -59,7 +59,7 @@ class SubBytesUnitTester(c: SubBytes, SCD: Boolean, Pipelined: Boolean) extends 
 
 class SubBytesTester extends ChiselFlatSpec {
 
-  private val SCD = false
+  private val SCD = true // true or false
   private val Pipelined = false // [false -> 640 LUTs, true -> 608 LUTs and 128 FFs]
   private val backendNames = Array("firrtl", "verilator")
   private val dir = "SubBytes"

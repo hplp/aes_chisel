@@ -10,7 +10,7 @@ class SubBytes(SCD: Boolean = false, Pipelined: Boolean = false) extends Module 
     val state_in = Input(Vec(Params.StateLength, UInt(8.W)))
     val state_out = Output(Vec(Params.StateLength, UInt(8.W)))
   })
-
+  printf("SBin: %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x %x\n", io.state_in(0), io.state_in(1), io.state_in(2), io.state_in(3), io.state_in(4), io.state_in(5), io.state_in(6), io.state_in(7), io.state_in(8), io.state_in(9), io.state_in(10), io.state_in(11), io.state_in(12), io.state_in(13), io.state_in(14), io.state_in(15))
   val s_box = VecInit(Array(
     0x63.U, 0x7c.U, 0x77.U, 0x7b.U, 0xf2.U, 0x6b.U, 0x6f.U, 0xc5.U, 0x30.U, 0x01.U, 0x67.U, 0x2b.U, 0xfe.U, 0xd7.U, 0xab.U, 0x76.U,
     0xca.U, 0x82.U, 0xc9.U, 0x7d.U, 0xfa.U, 0x59.U, 0x47.U, 0xf0.U, 0xad.U, 0xd4.U, 0xa2.U, 0xaf.U, 0x9c.U, 0xa4.U, 0x72.U, 0xc0.U,
