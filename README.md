@@ -25,3 +25,25 @@
 * Yet another AES implementation in Chisel: [github.com/yaozhaosh/chisel-aes](https://github.com/yaozhaosh/chisel-aes)
 * Best resource for learning Chisel: [chisel-bootcamp](https://github.com/freechipsproject/chisel-bootcamp)
 * Useful and highly recommeded [Scala class on coursera](https://www.coursera.org/learn/progfun1)
+
+## Citation
+
+This work resulted in the folowwing publications:
+
+```
+@article{guo2022agile,
+  title={Agile-AES: Implementation of configurable AES primitive with agile design approach},
+  author={Guo, Xinfei and El-Hadedy, Mohamed and Mosanu, Sergiu and Wei, Xiangdong and Skadron, Kevin and Stan, Mircea R},
+  journal={Integration},
+  year={2022},
+  publisher={Elsevier}
+}
+@inproceedings{mosanu2019flexi,
+  title={Flexi-AES: A Highly-Parameterizable Cipher for a Wide Range of Design Constraints},
+  author={Mosanu, Sergiu and Guo, Xinfei and El-Hadedy, Mohamed and Anghel, Lorena and Stan, Mircea},
+  booktitle={2019 IEEE 27th Annual International Symposium on Field-Programmable Custom Computing Machines (FCCM)},
+  pages={338--338},
+  year={2019},
+  organization={IEEE}
+}
+```
